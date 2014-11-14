@@ -23,7 +23,7 @@ public enum PartOfSpeech {
     ADVERB_COMPARATIVE("RBR"),
     ADVERB_SUPERLATIVE("RBS"),
     
-    //Closed Words
+    // ** Closed Words **
 	CONJUNCTION("CC"),
 	CARDINAL_NUMBER("CD"),
 	DETERMINER("DT"),
@@ -33,7 +33,7 @@ public enum PartOfSpeech {
 	LIST("LS"),
 	MODAL("MD"),
 	PREDETERMINER("PDT"),
-	POSSESSIVE("PDT"),
+	POSSESSIVE("POS"),
 	PERSONAL_PRONOUN("PRP"),
 	POSSESSIVE_PRONOUN("PSP$"),
 	PARTICLE("RP"),
@@ -140,6 +140,30 @@ public enum PartOfSpeech {
             return true;
         } else {
             return false;
+        }
+    }
+    
+    public static boolean isPronoun(PartOfSpeech pos) {
+        if (pos == PERSONAL_PRONOUN || pos == POSSESSIVE_PRONOUN) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public String simpleString() {
+        if (isNoun(this)) {
+            return "NN";
+        } else if (isVerb(this)) {
+            return "VB";
+        } else if (isAdjective(this)) {
+            return "JJ";
+        } else if (isAdverb(this)) {
+           return "RB";
+        } else if (isPronoun(this)) {
+            return "PRP";
+        } else {
+           return this.getCode();
         }
     }
 }

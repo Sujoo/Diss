@@ -6,6 +6,7 @@ import java.util.Properties;
 import sujoo.nlp.clean.CleanText;
 import sujoo.nlp.stanford.datatypes.PartOfSpeech;
 import sujoo.nlp.stanford.datatypes.StanfordNLPProperties;
+import sujoo.nlp.stanford.datatypes.WordLexem;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
@@ -84,6 +85,24 @@ public class StanfordNLP {
         for (CoreMap sentence : sentences) {
             for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
                 list.add(token.get(TextAnnotation.class));
+            }
+        }
+        
+        return list;
+    }
+    
+    public List<WordLexem> getWordLexems(String text) {
+        List<WordLexem> list = Lists.newArrayList();
+        
+        Annotation document = annotateText(text);
+        List<CoreMap> sentences = document.get(SentencesAnnotation.class);
+
+        for (CoreMap sentence : sentences) {
+            for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
+                String word = token.get(TextAnnotation.class);
+                String lexem = token.get(LemmaAnnotation.class);
+                String pos = PartOfSpeech.toPOS(token.get(PartOfSpeechAnnotation.class)).simpleString();
+                list.add(new WordLexem(word, lexem, pos));
             }
         }
         
