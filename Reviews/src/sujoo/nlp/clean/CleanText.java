@@ -25,11 +25,13 @@ public class CleanText {
     private static final Pattern extraSpaces = Pattern.compile("(\\s)\\s+");
     private static final Pattern half = Pattern.compile("Â½");
     
-    private static final Pattern leftBrace = Pattern.compile("-LRB-");
-    private static final Pattern rightBrace = Pattern.compile("-RRB-");
+    private static final Pattern leftBrace = Pattern.compile("-lrb-");
+    private static final Pattern rightBrace = Pattern.compile("-rrb-");
     private static final Pattern forwardSlash2 = Pattern.compile("\\\\/");
     private static final Pattern badPeriod = Pattern.compile("([a-zA-Z])\\.(\\w)");
     private static final Pattern wtfbr = Pattern.compile("<br / >");
+    
+    private static final Pattern height = Pattern.compile("(\\d)'(\\d+)\"*");
     
     public static String cleanText(String text) {
         text = www.matcher(text).replaceAll("[WebAddress]");
@@ -55,24 +57,24 @@ public class CleanText {
     }
     
     public static String cleanTextForMTurk(String text) {
-        text = www.matcher(text).replaceAll("[WebAddress]");
+        //text = www.matcher(text).replaceAll("[WebAddress]");
         text = emphasisWord.matcher(text).replaceAll("$1");
-        text = explicative1.matcher(text).replaceAll("explicative");
-        text = explicative2.matcher(text).replaceAll("explicative");
-        text = explicative3.matcher(text).replaceAll("explicative");
+        //text = explicative1.matcher(text).replaceAll("explicative");
+        //text = explicative2.matcher(text).replaceAll("explicative");
+        text = explicative3.matcher(text).replaceAll(" ");
         text = endingPunctuation.matcher(text).replaceAll("\\.");
         text = badPeriod.matcher(text).replaceAll("$1\\. $2");
         text = underscore.matcher(text).replaceAll(" ");
-        text = apostrophy.matcher(text).replaceAll("'");
-        text = lessThan.matcher(text).replaceAll("<");
-        text = greaterThan.matcher(text).replaceAll(">");
+        //text = apostrophy.matcher(text).replaceAll("'");
+        //text = lessThan.matcher(text).replaceAll("<");
+        //text = greaterThan.matcher(text).replaceAll(">");
         text = forwardSlash.matcher(text).replaceAll(" " + "/" + " ");
         text = backwardSlash.matcher(text).replaceAll(" " + "\\\\" + " ");
         text = hyphen2.matcher(text).replaceAll("$1 - $2");
-        text = diffQuotes.matcher(text).replaceAll("\"");
-        text = diffApos.matcher(text).replaceAll("'");
+        //text = diffQuotes.matcher(text).replaceAll("\"");
+        //text = diffApos.matcher(text).replaceAll("'");
         text = extraSpaces.matcher(text).replaceAll("$1"); 
-        text = half.matcher(text).replaceAll("1/2");
+        //text = half.matcher(text).replaceAll("1/2");
         
         return text.trim();
     }

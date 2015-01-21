@@ -15,52 +15,53 @@ import sujoo.nlp.stanford.datatypes.WordLexem;
 
 public class PrepareReviewsForHIT1 {
     private StanfordNLP nlp;
-    private BufferedReader reader;
-    private PrintWriter writer;
-    private PrintWriter reviewIdFile;
+    private BufferedReader reviewInputReader;
+    private PrintWriter reviewOuputFileWriter;
+    private PrintWriter reviewIdOutputFileWriter;
     
 
     public static void main(String[] args) throws Exception {
-        PrepareReviewsForHIT1 p = new PrepareReviewsForHIT1();
+        //PrepareReviewsForHIT1 p = new PrepareReviewsForHIT1("FinalizedReviews\\apparelReviews", "apparel.csv", "ApparelReviewIds.csv");
+        //PrepareReviewsForHIT1 p = new PrepareReviewsForHIT1("FinalizedReviews\\bookReviews", "book.csv", "BookReviewIds.csv");
+        //PrepareReviewsForHIT1 p = new PrepareReviewsForHIT1("FinalizedReviews\\cameraReviews", "camera.csv", "CameraReviewIds.csv");
+        PrepareReviewsForHIT1 p = new PrepareReviewsForHIT1("FinalizedReviews\\shoesReviews", "shoes2.csv", "ShoesReviewIds2.csv");
+
         p.prepare();
     }
 
-    public PrepareReviewsForHIT1() throws Exception {
+    public PrepareReviewsForHIT1(String reviewFile, String reviewOutputFile, String reviewIdOutputFile) throws Exception {
         nlp = StanfordNLP.createLemmaTagger();
-        // reader = new BufferedReader(new FileReader("C:\\Users\\mbcusick\\Dropbox\\MTurk\\BetaReviewDataSet.txt"));
-        reader = new BufferedReader(new FileReader("shoesReviews"));
-        // writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\mbcusick\\Dropbox\\MTurk\\BetaMturkCSV.csv"), "UTF-8")));
-        writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream("shoes.csv"), "UTF-8")));
-        writer.println("review1Id,review2Id,review1,review2");
+        reviewInputReader = new BufferedReader(new FileReader(reviewFile));
+        reviewOuputFileWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(reviewOutputFile), "UTF-8")));
+        reviewOuputFileWriter.println("review1Id,review2Id,review1,review2");
         
         
-        // reviewIdFile = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\mbcusick\\Dropbox\\MTurk\\ReviewIdFile.csv"), "UTF-8")));
-        reviewIdFile = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream("ShoeReviewIds.csv"), "UTF-8")));
-        reviewIdFile.println("reviewId\torigReviewText\twordLexemList");
+        reviewIdOutputFileWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(reviewIdOutputFile), "UTF-8")));
+        reviewIdOutputFileWriter.println("reviewId\torigReviewText\twordLexemList");
     }
 
     public void prepare() throws Exception {
         int reviewId = 1;
         String currentLine = null;
-        while ((currentLine = reader.readLine()) != null) {
+        while ((currentLine = reviewInputReader.readLine()) != null) {
             String text = currentLine.split("\t")[4];
-            reviewIdFile.print(reviewId + "\t" + text + "\t");
+            reviewIdOutputFileWriter.print(reviewId + "\t" + text + "\t");
             String rev1 = prepareReview(text, "rev1");
-            reviewIdFile.println();
+            reviewIdOutputFileWriter.println();
             reviewId++;
 
-            currentLine = reader.readLine();
+            currentLine = reviewInputReader.readLine();
             text = currentLine.split("\t")[4];
-            reviewIdFile.print(reviewId + "\t" + text + "\t");
+            reviewIdOutputFileWriter.print(reviewId + "\t" + text + "\t");
             String rev2 = prepareReview(text, "rev2");
-            reviewIdFile.println();
-            writer.println(reviewId-1 + "," + reviewId + "," + rev1 + "," + rev2);
+            reviewIdOutputFileWriter.println();
+            reviewOuputFileWriter.println(reviewId-1 + "," + reviewId + "," + rev1 + "," + rev2);
             reviewId++;
         }
 
-        reader.close();
-        writer.close();
-        reviewIdFile.close();
+        reviewInputReader.close();
+        reviewOuputFileWriter.close();
+        reviewIdOutputFileWriter.close();
     }
 
     public String prepareReview(String text, String reviewClass) {
@@ -81,12 +82,12 @@ public class PrepareReviewsForHIT1 {
             } else if (word.matches("'|\"|-lrb-|-rrb-|\\\\/|\\\\") || !PartOfSpeech.isWord(wordLexem.getPos())) {
                 result += " " + word;
             } else if (word.contains("'")) {
-                reviewIdFile.print(index + ":" + wordLexem.toString() + ";");
+                reviewIdOutputFileWriter.print(index + ":" + wordLexem.toString() + ";");
                 result += "<span class=" + reviewClass + " id=" + index + ">" + word + "</span>";
                 index++;
             } else {
                 result += " " + "<span class=" + reviewClass + " id=" + index + ">" + word + "</span>";
-                reviewIdFile.print(index + ":" + wordLexem.toString() + ";");
+                reviewIdOutputFileWriter.print(index + ":" + wordLexem.toString() + ";");
                 index++;
             }
         }

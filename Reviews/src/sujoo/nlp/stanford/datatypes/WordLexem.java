@@ -31,6 +31,10 @@ public class WordLexem {
     public String shortString() {
         return lexem + ":" + pos;
     }
+    
+    public String simpleString() {
+        return word;
+    }
 
     @Override
     public int hashCode() {

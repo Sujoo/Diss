@@ -18,9 +18,12 @@ public class SelectReviews {
     private String gl;
 
     public static void main(String[] args) throws Exception {
-        SelectReviews p = new SelectReviews(4);
-        p.identifySubCats();
+        SelectReviews p = new SelectReviews(3);
+        //p.identifySubCats();
         //p.selectShoeReviews();
+        //p.selectApparelReviews();
+        //p.selectBookReviews();
+        p.selectCameraReviews();
     }
 
     public SelectReviews(int type) throws Exception {
@@ -114,5 +117,90 @@ public class SelectReviews {
         for (String subcat : subcats.elementSet()) {
             System.out.println(subcat + " : " + subcats.count(subcat));
         }
+    }
+    
+    public void selectApparelReviews() throws Exception {
+        int minWordsInReview = 4;
+        int counter = 0;
+
+        String currentLine = null;
+        currentLine = reader.readLine();
+        // 0 review_id 1 parent_asin_name 2 parent_asin 3 ASIN 4 Product Group Description 5 productcategory
+        // 6 subcategory 7 enum_rating 8 submission_date 9 overall_rating 10 helpful_count 11 total_vote_count
+        // 12 review_title 13 text_fragment 14 offset
+        while ((currentLine = reader.readLine()) != null) {
+            String[] fields = currentLine.split("\t");
+            if (fields[4].equals("gl_apparel")) {
+                String subcat = fields[6];
+                if (subcat.equals("2790 Dresses")) {
+                    if (fields[13].split(" ").length >= minWordsInReview) { 
+                        if (counter < 500) {
+                            writer.println(fields[1] + "\t" + fields[8] + "\t" + fields[9] + "\t" + fields[12] + "\t" + fields[13]);
+                            counter++;
+                        }
+                    }
+                }
+            }
+        }
+
+        reader.close();
+        writer.close();
+    }
+    
+    
+    public void selectCameraReviews() throws Exception {
+        int minWordsInReview = 4;
+        int counter = 0;
+
+        String currentLine = null;
+        currentLine = reader.readLine();
+        // 0 review_id 1 parent_asin_name 2 parent_asin 3 ASIN 4 Product Group Description 5 productcategory
+        // 6 subcategory 7 submission_date 8 overall_rating 9 helpful_count 10 total_vote_count
+        // 11 review_title 12 text_fragment 13 offset
+        while ((currentLine = reader.readLine()) != null) {
+            String[] fields = currentLine.split("\t");
+            if (fields[4].equals("gl_camera")) {
+                String subcat = fields[6];
+                if (subcat.equals("110 Point & Shoot Cameras")) {
+                    if (fields[12].split(" ").length >= minWordsInReview) { 
+                        if (counter < 500) {
+                            writer.println(fields[1] + "\t" + fields[7] + "\t" + fields[8] + "\t" + fields[11] + "\t" + fields[12]);
+                            counter++;
+                        }
+                    }
+                }
+            }
+        }
+
+        reader.close();
+        writer.close();
+    }
+    
+    public void selectBookReviews() throws Exception {
+        int minWordsInReview = 4;
+        int counter = 0;
+
+        String currentLine = null;
+        currentLine = reader.readLine();
+        // 0 review_id 1 parent_asin_name 2 parent_asin 3 ASIN 4 Product Group Description 5 productcategory
+        // 6 subcategory 7 submission_date 8 overall_rating 9 helpful_count 10 total_vote_count
+        // 11 review_title 12 text_fragment 13 offset
+        while ((currentLine = reader.readLine()) != null) {
+            String[] fields = currentLine.split("\t");
+            if (fields[4].equals("gl_digital_ebook_purchase")) {
+                String subcat = fields[6];
+                if (subcat.equals("Science Fiction and Fantasy/Fantasy")) {
+                    if (fields[12].split(" ").length >= minWordsInReview) { 
+                        if (counter < 500) {
+                            writer.println(fields[1] + "\t" + fields[7] + "\t" + fields[8] + "\t" + fields[11] + "\t" + fields[12]);
+                            counter++;
+                        }
+                    }
+                }
+            }
+        }
+
+        reader.close();
+        writer.close();
     }
 }
