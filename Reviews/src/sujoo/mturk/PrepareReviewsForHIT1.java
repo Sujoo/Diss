@@ -1,5 +1,9 @@
 package sujoo.mturk;
 
+/**
+ * Select important words from review text
+ */
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
@@ -12,6 +16,7 @@ import sujoo.nlp.clean.CleanText;
 import sujoo.nlp.stanford.StanfordNLP;
 import sujoo.nlp.stanford.datatypes.PartOfSpeech;
 import sujoo.nlp.stanford.datatypes.WordLexem;
+
 
 public class PrepareReviewsForHIT1 {
     private StanfordNLP nlp;

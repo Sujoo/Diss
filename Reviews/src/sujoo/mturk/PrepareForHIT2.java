@@ -1,5 +1,9 @@
 package sujoo.mturk;
 
+/**
+ * Identify similar words in groups
+ */
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
@@ -55,7 +59,7 @@ public class PrepareForHIT2 {
 
             String key = id + "_" + phrase;
 
-            if (reviewIds.split(",").length >= 5) {
+            if (reviewIds.split(",").length >= 4) {
                 String[] examples = frags.split(",");
                 if (examples.length > 3) {
                     int one = random.nextInt(examples.length);

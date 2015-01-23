@@ -27,7 +27,7 @@ import com.google.common.collect.Sets;
 public class ProcessResultsFromHIT2 {
     private BufferedReader mTurkResultsReader;
     private BufferedReader wordListReader;
-    private PrintWriter selectedWordListWriter;
+    private PrintWriter groupWriter;
     private Map<Integer, String> wordListMap;
 
     private ListMultimap<String, String> selectedWords;
@@ -43,17 +43,17 @@ public class ProcessResultsFromHIT2 {
     // replace "" with "
 
     public static void main(String[] args) throws Exception {
-        ProcessResultsFromHIT2 p = new ProcessResultsFromHIT2("HIT2Downloads\\ApparelGroups1a.csv", "ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\something.csv");
+        ProcessResultsFromHIT2 p = new ProcessResultsFromHIT2("HIT2Downloads\\ApparelGroups1.csv", "ReferenceFiles\\ApparelWordList.csv", "TestGroups.csv");
         p.prepareIdFile();
-//        p.process(47, 51);
-        p.processPairs();
+        p.process(47, 51);
+        // p.processPairs();
         p.outputGroups();
     }
 
     public ProcessResultsFromHIT2(String inputFile, String wordListFile, String outputFile) throws Exception {
         mTurkResultsReader = new BufferedReader(new FileReader(inputFile));
         wordListReader = new BufferedReader(new FileReader(wordListFile));
-        selectedWordListWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8")));
+        groupWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8")));
 
         wordListMap = Maps.newHashMap();
         selectedWords = ArrayListMultimap.create();
@@ -259,14 +259,34 @@ public class ProcessResultsFromHIT2 {
                 System.out.println(selectedTuple);
             }
         }
+        
+        Set<Integer> wordsInGroup = Sets.newHashSet();
 
+        groupWriter.println("GroupId\tWords");
+        int groupId = 0;
         for (Set<Integer> group : groups) {
+            groupId++;
+            groupWriter.print(groupId + "\t");
             System.out.print(group.size() + "\t");
+            String wordsCsv = "";
             for (Integer i : group) {
+                wordsInGroup.add(i);
+                wordsCsv += i + ",";
                 System.out.print(wordListMap.get(i) + " , ");
             }
+            groupWriter.println(wordsCsv.subSequence(0, wordsCsv.length()-1));
             System.out.println();
-            // System.out.println(group);
+        }
+        groupWriter.close();
+
+        Set<Integer> allWords = Sets.newHashSet(wordsInHIT.values());
+        System.out.println(allWords.size());
+        System.out.println(allWords);
+        System.out.println(wordsInGroup.size());
+        for (Integer word : allWords) {
+            if (!wordsInGroup.contains(word)) {
+                System.out.print(word + ",");
+            }
         }
     }
     
