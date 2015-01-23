@@ -12,15 +12,12 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import sujoo.nlp.stanford.datatypes.WordLexem;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class PrepareForHIT2 {
@@ -30,13 +27,15 @@ public class PrepareForHIT2 {
 
     private ListMultimap<String, String> phraseExamplesMap;
     private Random random;
+    private List<String> wordIdsToInclude;
 
     public static void main(String[] args) throws Exception {
-        PrepareForHIT2 p = new PrepareForHIT2("ReferenceFiles\\ApparelWordList.csv", "testOutput.csv");
+        PrepareForHIT2 p = new PrepareForHIT2("ReferenceFiles\\ApparelWordList.csv", "HIT2Uploads\\ApparelGroups2.csv");
         p.prepare();
-        //p.outputFor4WordGroups();
+        p.setupExtraWordList();
+        p.outputFor4WordGroups();
         //p.outputForWordPairs();
-        p.outputPairwise();
+        //p.outputPairwise();
     }
 
     public PrepareForHIT2(String inputFile, String hit2Output) throws Exception {
@@ -44,6 +43,12 @@ public class PrepareForHIT2 {
         hit2Writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(hit2Output), "UTF-8")));
         phraseExamplesMap = ArrayListMultimap.create();
         random = new Random();
+        wordIdsToInclude = Lists.newArrayList();
+    }
+    
+    public void setupExtraWordList() {
+        String[] words = "17,18,23,25,30,31,35,39,47,48,51,33,6,43,26,34,15,45".split(",");
+        wordIdsToInclude = Lists.newArrayList(words);        
     }
 
     public void prepare() throws Exception {
@@ -59,7 +64,7 @@ public class PrepareForHIT2 {
 
             String key = id + "_" + phrase;
 
-            if (reviewIds.split(",").length >= 4) {
+            if (reviewIds.split(",").length == 3 || wordIdsToInclude.contains(id) || reviewIds.split(",").length == 2) {
                 String[] examples = frags.split(",");
                 if (examples.length > 3) {
                     int one = random.nextInt(examples.length);
@@ -83,6 +88,7 @@ public class PrepareForHIT2 {
                 }
             }
         }
+        System.out.println(phraseExamplesMap.keySet().size());
     }
 
     public void outputFor4WordGroups() {

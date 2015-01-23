@@ -32,7 +32,7 @@ public class PrepareForHIT3 {
     private Random random;
 
     public static void main(String[] args) throws Exception {
-        PrepareForHIT3 p = new PrepareForHIT3("ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv", "hit3Output.csv");
+        PrepareForHIT3 p = new PrepareForHIT3("ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv", "HIT3Uploads\\ApparelGroups2.csv");
         p.prepare();
         p.outputForInitialGroupValidation();
     }
@@ -99,16 +99,17 @@ public class PrepareForHIT3 {
     }
 
     public void outputForInitialGroupValidation() {        
-        hit3Writer.println("g1Id,g2Id,g3Id,g1,g2,g3");
+        //hit3Writer.println("g1Id,g2Id,g3Id,g1,g2,g3");
+        hit3Writer.println("g1Id,g1");
         Iterator<Integer> itr = groupWordMap.keySet().iterator();
         while (itr.hasNext()) {
             int g1Id = itr.next();
-            int g2Id = itr.next();
-            int g3Id = itr.next();
-            hit3Writer.print(g1Id + "," + g2Id + "," + g3Id);
+            //int g2Id = itr.next();
+            //int g3Id = itr.next();
+            hit3Writer.print(g1Id);// + "," + g2Id + "," + g3Id);
             printGroupTable(g1Id, "g1");
-            printGroupTable(g2Id, "g2");
-            printGroupTable(g3Id, "g3");
+            //printGroupTable(g2Id, "g2");
+            //printGroupTable(g3Id, "g3");
             hit3Writer.println();
         }
         hit3Writer.close();

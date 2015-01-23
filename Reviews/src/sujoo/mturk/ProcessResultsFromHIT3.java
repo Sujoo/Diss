@@ -28,11 +28,10 @@ public class ProcessResultsFromHIT3 {
     private BufferedReader wordListReader;
     private BufferedReader groupReader;
     private PrintWriter groupWriter;
-    private Map<Integer, String> wordListMap;
 
     private ListMultimap<String, String> selectedWords;
 
-    private SetMultimap<String, Integer> wordsInHIT;
+    private Map<Integer, String> wordListMap;
     private ListMultimap<Integer, Integer> groupWordMap;
     private Multiset<Integer> okGroups;
     private Map<Integer, Multiset<Integer>> wordsDontBelongInGroup;
@@ -45,9 +44,9 @@ public class ProcessResultsFromHIT3 {
     // replace "" with "
 
     public static void main(String[] args) throws Exception {
-        ProcessResultsFromHIT3 p = new ProcessResultsFromHIT3("HIT3Downloads\\ApparelGroups1.csv", "ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv", "testhit3results.csv");
+        ProcessResultsFromHIT3 p = new ProcessResultsFromHIT3("HIT3Downloads\\ApparelGroups2.csv", "ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv", "testhit3results.csv");
         p.prepare();
-        p.processFrom3PerHIT();
+        p.processFrom1PerHIT();
         p.writeOutput();
     }
 
@@ -59,7 +58,6 @@ public class ProcessResultsFromHIT3 {
 
         wordListMap = Maps.newHashMap();
         selectedWords = ArrayListMultimap.create();
-        wordsInHIT = HashMultimap.create();
         groupWordMap = ArrayListMultimap.create();
         okGroups = HashMultiset.create();
         wordsDontBelongInGroup = Maps.newHashMap();
@@ -132,6 +130,37 @@ public class ProcessResultsFromHIT3 {
             checkResult(g1Id, allBelongG1, wordIdsG1);
             checkResult(g2Id, allBelongG2, wordIdsG2);
             checkResult(g3Id, allBelongG3, wordIdsG3);
+        }
+
+        mTurkResultsReader.close();
+    }
+    
+    public void processFrom1PerHIT() throws Exception {
+        // 0 HITId 1 HITTypeId 2 Title 3 Description 4 Keywords 5 Reward 6
+        // CreationTime 7 MaxAssignments 8 RequesterAnnotation
+        // 9 AssignmentDurationInSeconds 10 AutoApprovalDelayInSeconds 11
+        // Expiration 12 NumberOfSimilarHITs 13 LifetimeInSeconds 14
+        // AssignmentId
+        // 15 WorkerId 16 AssignmentStatus 17 AcceptTime 18 SubmitTime 19
+        // AutoApprovalTime 20 ApprovalTime 21 RejectionTime
+        // 22 RequesterFeedback 23 WorkTimeInSeconds 24 LifetimeApprovalRate 25
+        // Last30DaysApprovalRate 26 Last7DaysApprovalRate
+        // 27 Input.g1Id    28 Input.g1    29 Answer.G1   30 Answer.keyphrases1
+
+        String currentLine = null;
+        currentLine = mTurkResultsReader.readLine();
+        while ((currentLine = mTurkResultsReader.readLine()) != null) {
+            String[] hitResult = currentLine.split("\t");
+            int g1Id = Integer.parseInt(hitResult[27]);
+            groupIds.add(g1Id);
+            String allBelongG1 = hitResult[29];
+            String wordIdsG1 = "";
+            
+            if (hitResult.length > 30) {
+                wordIdsG1 = hitResult[30];
+            }
+            
+            checkResult(g1Id, allBelongG1, wordIdsG1);
         }
 
         mTurkResultsReader.close();
