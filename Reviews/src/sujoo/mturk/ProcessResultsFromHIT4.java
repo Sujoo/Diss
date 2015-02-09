@@ -27,9 +27,9 @@ public class ProcessResultsFromHIT4 {
     // replace "" with "
 
     public static void main(String[] args) throws Exception {
-        ProcessResultsFromHIT4 p = new ProcessResultsFromHIT4("HIT4Downloads\\ApparelGroups1.csv", "ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv");
+        ProcessResultsFromHIT4 p = new ProcessResultsFromHIT4("HIT4Downloads\\ApparelGroups4-.csv", "ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv");
         p.prepare();
-        p.process();
+        p.processFrom10();
         p.printOutput();
     }
 
@@ -85,39 +85,123 @@ public class ProcessResultsFromHIT4 {
         currentLine = mTurkResultsReader.readLine();
         while ((currentLine = mTurkResultsReader.readLine()) != null) {
             String[] hitResult = currentLine.split("\t");
+            if (hitResult.length != 32) {
+                System.out.println("hi");
+            }
             int wordId1 = Integer.parseInt(hitResult[28].split(" : ")[0].replace("#", ""));
-            int wordId2 = Integer.parseInt(hitResult[29].split(" : ")[0].replace("#", ""));
             String[] results = hitResult[31].split("\\|");
             String result1 = results[0];
-            String result2 = results[1];
-            if (result1.equals("err") || result2.equals("err")) {
+            if (result1.equals("err")) {
                 System.out.println("mturk fail");
             }
-            
             if (!wordAssignmentCounts.containsKey(wordId1)) {
                 Multiset<String> set = HashMultiset.create();
                 wordAssignmentCounts.put(wordId1, set);
             }
-            if (!wordAssignmentCounts.containsKey(wordId2)) {
-                Multiset<String> set = HashMultiset.create();
-                wordAssignmentCounts.put(wordId2, set);
-            }
-            
             wordAssignmentCounts.get(wordId1).add(result1);
-            wordAssignmentCounts.get(wordId2).add(result2);
+            
+            if (!hitResult[29].equals("")) {
+                int wordId2 = Integer.parseInt(hitResult[29].split(" : ")[0].replace("#", ""));
+                String result2 = results[1];
+                if (result2.equals("err")) {
+                    System.out.println("mturk fail");
+                }
+                if (!wordAssignmentCounts.containsKey(wordId2)) {
+                    Multiset<String> set = HashMultiset.create();
+                    wordAssignmentCounts.put(wordId2, set);
+                }
+                wordAssignmentCounts.get(wordId2).add(result2);
+            }
         }
 
         mTurkResultsReader.close();
     }
     
+    public void processFrom10() throws Exception {
+        // 0 HITId 1 HITTypeId 2 Title 3 Description 4 Keywords 5 Reward 6
+        // CreationTime 7 MaxAssignments 8 RequesterAnnotation
+        // 9 AssignmentDurationInSeconds 10 AutoApprovalDelayInSeconds 11
+        // Expiration 12 NumberOfSimilarHITs 13 LifetimeInSeconds 14
+        // AssignmentId
+        // 15 WorkerId 16 AssignmentStatus 17 AcceptTime 18 SubmitTime 19
+        // AutoApprovalTime 20 ApprovalTime 21 RejectionTime
+        // 22 RequesterFeedback 23 WorkTimeInSeconds 24 LifetimeApprovalRate 25
+        // Last30DaysApprovalRate 26 Last7DaysApprovalRate
+        // 27 Input.tables  28 Input.w1    29 Input.w2    30 Answer.keyphrases1  
+        // 31 Answer.word#
+        // 28 Input.w1  29 Input.w2    30 Input.w3    31 Input.w4    32 Input.w5
+        // 33 Input.w6    34 Input.w7    35 Input.w8    36 Input.w9    37 Input.w10
+        // 38 Answer.keyphrases1  39 Answer.word#
+
+        String currentLine = null;
+        currentLine = mTurkResultsReader.readLine();
+        while ((currentLine = mTurkResultsReader.readLine()) != null) {
+            String[] hitResult = currentLine.split("\t");
+            if (hitResult.length != 40) {
+                System.out.println("hi");
+            }
+            String[] results = hitResult[39].split("\\|");
+
+            getWordAssignment(hitResult[28], results[0]);
+            getWordAssignment(hitResult[29], results[1]);
+            getWordAssignment(hitResult[30], results[2]);
+            getWordAssignment(hitResult[31], results[3]);
+            getWordAssignment(hitResult[32], results[4]);
+            getWordAssignment(hitResult[33], results[5]);
+            getWordAssignment(hitResult[34], results[6]);
+            getWordAssignment(hitResult[35], results[7]);
+            getWordAssignment(hitResult[36], results[8]);
+            getWordAssignment(hitResult[37], results[9]);
+        }
+
+        mTurkResultsReader.close();
+    }
+    
+    public void getWordAssignment(String wordInput, String wordAssignment) {
+        if (!wordInput.equals("")) {
+            int wordId = Integer.parseInt(wordInput.split(" : ")[0].replace("#", ""));
+            if (wordId == 657) {
+                System.out.println("fit is great");
+            }
+            if (wordAssignment.equals("err")) {
+                System.out.println("mturk fail: err");
+            }
+            if (!wordAssignmentCounts.containsKey(wordId)) {
+                Multiset<String> set = HashMultiset.create();
+                wordAssignmentCounts.put(wordId, set);
+            }
+            wordAssignmentCounts.get(wordId).add(wordAssignment);
+        }
+    }
+    
     public void printOutput() {
         for (Integer wordId : wordAssignmentCounts.keySet()) {
             System.out.println(wordListMap.get(wordId) + " : " + wordId);
+            int selectedGroup = 0;
             for (String assignment : wordAssignmentCounts.get(wordId).elementSet()) {
-                System.out.print("G" + assignment + ":" + wordAssignmentCounts.get(wordId).count(assignment) + ", ");
+                int count = wordAssignmentCounts.get(wordId).count(assignment); 
+                System.out.print("G" + assignment + ":" + count + ", ");
+                if (count >= 3 && !assignment.equals("ng")) {
+                    if (selectedGroup == 0) {
+                        selectedGroup = Integer.parseInt(assignment);
+                        groupWordMap.put(selectedGroup, wordId);
+                        System.out.println("Assigned to Group " + selectedGroup);
+                    } else {
+                        System.out.println("wtf double 3 vote!");
+                    }
+                }
             }
             System.out.println();
             System.out.println();
+        }
+        
+        for (Integer group : groupWordMap.keySet()) {
+            System.out.print(group + "\t");
+            String wordsCsv = "";
+            for (Integer i : groupWordMap.get(group)) {
+                wordsCsv += i + ",";
+            }
+            System.out.println(wordsCsv.subSequence(0, wordsCsv.length()-1));
         }
     }
 }

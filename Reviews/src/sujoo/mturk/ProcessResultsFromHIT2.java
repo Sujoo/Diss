@@ -43,7 +43,7 @@ public class ProcessResultsFromHIT2 {
     // replace "" with "
 
     public static void main(String[] args) throws Exception {
-        ProcessResultsFromHIT2 p = new ProcessResultsFromHIT2("HIT2Downloads\\ApparelGroups1.csv", "ReferenceFiles\\ApparelWordList.csv", "TestGroups.csv");
+        ProcessResultsFromHIT2 p = new ProcessResultsFromHIT2("HIT2Downloads\\ApparelGroups3.csv", "ReferenceFiles\\ApparelWordList.csv", "TestGroups.csv");
         p.prepareIdFile();
         p.process(47, 51);
         // p.processPairs();
@@ -280,9 +280,11 @@ public class ProcessResultsFromHIT2 {
         groupWriter.close();
 
         Set<Integer> allWords = Sets.newHashSet(wordsInHIT.values());
+        System.out.println("All Words Used in HIT");
         System.out.println(allWords.size());
         System.out.println(allWords);
-        System.out.println(wordsInGroup.size());
+        System.out.println("# Words placed into groups: " + wordsInGroup.size());
+        System.out.println("Words not placed into groups:");
         for (Integer word : allWords) {
             if (!wordsInGroup.contains(word)) {
                 System.out.print(word + ",");

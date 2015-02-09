@@ -51,7 +51,9 @@ public class ProcessResultsFromHIT1 {
     // replace "" with "
 
     public static void main(String[] args) throws Exception {
-        ProcessResultsFromHIT1 p = new ProcessResultsFromHIT1("HIT1Downloads\\allApparelResults.csv", "ReferenceFiles\\ApparelReviewIds.csv", "ReferenceFiles\\ApparelWordList.csv");
+        //ProcessResultsFromHIT1 p = new ProcessResultsFromHIT1("HIT1Downloads\\allApparelResults.csv", "ReferenceFiles\\ApparelReviewIds.csv", "ReferenceFiles\\ApparelWordList.csv");
+        //ProcessResultsFromHIT1 p = new ProcessResultsFromHIT1("HIT1Downloads\\bookResults.csv", "ReferenceFiles\\BookReviewIds.csv", "ReferenceFiles\\BookWordList.csv");
+        ProcessResultsFromHIT1 p = new ProcessResultsFromHIT1("HIT1Downloads\\cameraResults.csv", "ReferenceFiles\\CameraReviewIds.csv", "ReferenceFiles\\CameraWordList.csv");
         p.prepareIdFile();
         p.process();
         p.printKeyphraseResults();

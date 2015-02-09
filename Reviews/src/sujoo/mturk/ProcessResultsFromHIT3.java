@@ -1,35 +1,23 @@
 package sujoo.mturk;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 
 public class ProcessResultsFromHIT3 {
     private BufferedReader mTurkResultsReader;
     private BufferedReader wordListReader;
     private BufferedReader groupReader;
-    private PrintWriter groupWriter;
-
-    private ListMultimap<String, String> selectedWords;
 
     private Map<Integer, String> wordListMap;
     private ListMultimap<Integer, Integer> groupWordMap;
@@ -44,20 +32,18 @@ public class ProcessResultsFromHIT3 {
     // replace "" with "
 
     public static void main(String[] args) throws Exception {
-        ProcessResultsFromHIT3 p = new ProcessResultsFromHIT3("HIT3Downloads\\ApparelGroups2.csv", "ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv", "testhit3results.csv");
+        ProcessResultsFromHIT3 p = new ProcessResultsFromHIT3("HIT3Downloads\\ApparelGroups2a.csv", "ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv");
         p.prepare();
         p.processFrom1PerHIT();
         p.writeOutput();
     }
 
-    public ProcessResultsFromHIT3(String inputFile, String inputWordListFile, String inputGroupFile, String outputFile) throws Exception {
+    public ProcessResultsFromHIT3(String inputFile, String inputWordListFile, String inputGroupFile) throws Exception {
         mTurkResultsReader = new BufferedReader(new FileReader(inputFile));
         wordListReader = new BufferedReader(new FileReader(inputWordListFile));
         groupReader = new BufferedReader(new FileReader(inputGroupFile));
-        groupWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8")));
 
         wordListMap = Maps.newHashMap();
-        selectedWords = ArrayListMultimap.create();
         groupWordMap = ArrayListMultimap.create();
         okGroups = HashMultiset.create();
         wordsDontBelongInGroup = Maps.newHashMap();
@@ -79,12 +65,13 @@ public class ProcessResultsFromHIT3 {
         currentLine = null;
         currentLine = groupReader.readLine();
         while ((currentLine = groupReader.readLine()) != null) {
-            // GroupId  Words
+            // GroupId Words
             String[] fields = currentLine.split("\t");
             int id = Integer.parseInt(fields[0]);
             String[] wordIds = fields[1].split(",");
             for (int i = 0; i < wordIds.length; i++) {
-                groupWordMap.put(id, Integer.parseInt(wordIds[i]));            }
+                groupWordMap.put(id, Integer.parseInt(wordIds[i]));
+            }
         }
         groupReader.close();
     }
@@ -152,15 +139,19 @@ public class ProcessResultsFromHIT3 {
         while ((currentLine = mTurkResultsReader.readLine()) != null) {
             String[] hitResult = currentLine.split("\t");
             int g1Id = Integer.parseInt(hitResult[27]);
-            groupIds.add(g1Id);
-            String allBelongG1 = hitResult[29];
-            String wordIdsG1 = "";
-            
-            if (hitResult.length > 30) {
-                wordIdsG1 = hitResult[30];
+            if (hitResult.length < 30) {
+                System.out.println("Turker FAIL: " + g1Id);
+            } else {
+                groupIds.add(g1Id);
+                String allBelongG1 = hitResult[29];
+                String wordIdsG1 = "";
+
+                if (hitResult.length > 30) {
+                    wordIdsG1 = hitResult[30];
+                }
+
+                checkResult(g1Id, allBelongG1, wordIdsG1);
             }
-            
-            checkResult(g1Id, allBelongG1, wordIdsG1);
         }
 
         mTurkResultsReader.close();

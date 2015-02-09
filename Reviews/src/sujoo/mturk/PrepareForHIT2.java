@@ -30,9 +30,9 @@ public class PrepareForHIT2 {
     private List<String> wordIdsToInclude;
 
     public static void main(String[] args) throws Exception {
-        PrepareForHIT2 p = new PrepareForHIT2("ReferenceFiles\\ApparelWordList.csv", "HIT2Uploads\\ApparelGroups2.csv");
-        p.prepare();
+        PrepareForHIT2 p = new PrepareForHIT2("ReferenceFiles\\ApparelWordList.csv", "HIT2Uploads\\ApparelGroups3.csv");
         p.setupExtraWordList();
+        p.prepare();
         p.outputFor4WordGroups();
         //p.outputForWordPairs();
         //p.outputPairwise();
@@ -47,7 +47,7 @@ public class PrepareForHIT2 {
     }
     
     public void setupExtraWordList() {
-        String[] words = "17,18,23,25,30,31,35,39,47,48,51,33,6,43,26,34,15,45".split(",");
+        String[] words = "15,23,25,26,30,31,34,35,43,45,47,48,51,54,56,57,59,64,65,66,73,80,81,83,84,85,90,93,96,99,105,106,107,110,111,113,116,117,119,122,124,131,134,135,138,140,143,144,146,151,153,158,159,161,163,167,168,169".split(",");
         wordIdsToInclude = Lists.newArrayList(words);        
     }
 
@@ -64,7 +64,8 @@ public class PrepareForHIT2 {
 
             String key = id + "_" + phrase;
 
-            if (reviewIds.split(",").length == 3 || wordIdsToInclude.contains(id) || reviewIds.split(",").length == 2) {
+//            if (reviewIds.split(",").length == 3 || wordIdsToInclude.contains(id) || reviewIds.split(",").length == 2) {
+            if (wordIdsToInclude.contains(id)) {
                 String[] examples = frags.split(",");
                 if (examples.length > 3) {
                     int one = random.nextInt(examples.length);
@@ -88,7 +89,7 @@ public class PrepareForHIT2 {
                 }
             }
         }
-        System.out.println(phraseExamplesMap.keySet().size());
+        System.out.println("Word Count: " + phraseExamplesMap.keySet().size());
     }
 
     public void outputFor4WordGroups() {

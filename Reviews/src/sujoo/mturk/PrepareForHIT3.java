@@ -32,7 +32,7 @@ public class PrepareForHIT3 {
     private Random random;
 
     public static void main(String[] args) throws Exception {
-        PrepareForHIT3 p = new PrepareForHIT3("ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv", "HIT3Uploads\\ApparelGroups2.csv");
+        PrepareForHIT3 p = new PrepareForHIT3("ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv", "HIT3Uploads\\ApparelGroups3.csv");
         p.prepare();
         p.outputForInitialGroupValidation();
     }
