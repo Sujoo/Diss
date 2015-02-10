@@ -20,7 +20,7 @@ import com.google.common.collect.Maps;
  *
  */
 
-public class PrepareForHIT3 {
+public class PrepareHIT3_Validate {
     
     private BufferedReader wordListReader;
     private BufferedReader groupReader;
@@ -33,12 +33,12 @@ public class PrepareForHIT3 {
     private static final int wordsPerRow = 7;
 
     public static void main(String[] args) throws Exception {
-        PrepareForHIT3 p = new PrepareForHIT3("ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv", "HIT3Uploads\\ApparelGroups4.csv");
+        PrepareHIT3_Validate p = new PrepareHIT3_Validate("ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv", "HIT3Uploads\\ApparelGroups4.csv");
         p.prepare();
         p.outputForInitialGroupValidation();
     }
 
-    public PrepareForHIT3(String inputWordListFile, String inputGroupFile, String hit3Output) throws Exception {
+    public PrepareHIT3_Validate(String inputWordListFile, String inputGroupFile, String hit3Output) throws Exception {
         wordListReader = new BufferedReader(new FileReader(inputWordListFile));
         groupReader = new BufferedReader(new FileReader(inputGroupFile));
         hit3Writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(hit3Output), "UTF-8")));

@@ -7,12 +7,8 @@ import java.io.FileReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import org.json.JSONArray;
@@ -32,7 +28,7 @@ import com.google.common.collect.Sets;
 
 import sujoo.nlp.stanford.datatypes.WordLexem;
 
-public class ProcessResultsFromHIT1 {
+public class ProcessHIT1_WordIdentify {
     private BufferedReader mTurkResultsReader;
     private BufferedReader reviewIdReader;
     private PrintWriter selectedWordListWriter;
@@ -53,7 +49,7 @@ public class ProcessResultsFromHIT1 {
     public static void main(String[] args) throws Exception {
         //ProcessResultsFromHIT1 p = new ProcessResultsFromHIT1("HIT1Downloads\\allApparelResults.csv", "ReferenceFiles\\ApparelReviewIds.csv", "ReferenceFiles\\ApparelWordList.csv");
         //ProcessResultsFromHIT1 p = new ProcessResultsFromHIT1("HIT1Downloads\\bookResults.csv", "ReferenceFiles\\BookReviewIds.csv", "ReferenceFiles\\BookWordList.csv");
-        ProcessResultsFromHIT1 p = new ProcessResultsFromHIT1("HIT1Downloads\\cameraResults.csv", "ReferenceFiles\\CameraReviewIds.csv", "ReferenceFiles\\CameraWordList.csv");
+        ProcessHIT1_WordIdentify p = new ProcessHIT1_WordIdentify("HIT1Downloads\\cameraResults.csv", "ReferenceFiles\\CameraReviewIds.csv", "ReferenceFiles\\CameraWordList.csv");
         p.prepareIdFile();
         p.process();
         p.printKeyphraseResults();
@@ -62,7 +58,7 @@ public class ProcessResultsFromHIT1 {
         // p.printKeyphraseResultsOld();
     }
 
-    public ProcessResultsFromHIT1(String inputFile, String reviewIdFile, String wordListFile) throws Exception {
+    public ProcessHIT1_WordIdentify(String inputFile, String reviewIdFile, String wordListFile) throws Exception {
         this.reviewIdFile = reviewIdFile;
         mTurkResultsReader = new BufferedReader(new FileReader(inputFile));
         // reader = new BufferedReader(new FileReader("testresults.csv"));

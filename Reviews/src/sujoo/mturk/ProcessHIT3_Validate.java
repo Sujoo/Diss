@@ -14,7 +14,7 @@ import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
 
-public class ProcessResultsFromHIT3 {
+public class ProcessHIT3_Validate {
     private BufferedReader mTurkResultsReader;
     private BufferedReader wordListReader;
     private BufferedReader groupReader;
@@ -32,13 +32,13 @@ public class ProcessResultsFromHIT3 {
     // replace "" with "
 
     public static void main(String[] args) throws Exception {
-        ProcessResultsFromHIT3 p = new ProcessResultsFromHIT3("HIT3Downloads\\ApparelGroups4.csv", "ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv");
+        ProcessHIT3_Validate p = new ProcessHIT3_Validate("HIT3Downloads\\ApparelGroups4.csv", "ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv");
         p.prepare();
         p.processFrom1PerHIT();
         p.writeOutput();
     }
 
-    public ProcessResultsFromHIT3(String inputFile, String inputWordListFile, String inputGroupFile) throws Exception {
+    public ProcessHIT3_Validate(String inputFile, String inputWordListFile, String inputGroupFile) throws Exception {
         mTurkResultsReader = new BufferedReader(new FileReader(inputFile));
         wordListReader = new BufferedReader(new FileReader(inputWordListFile));
         groupReader = new BufferedReader(new FileReader(inputGroupFile));

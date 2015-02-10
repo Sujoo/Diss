@@ -18,7 +18,7 @@ import sujoo.nlp.stanford.datatypes.PartOfSpeech;
 import sujoo.nlp.stanford.datatypes.WordLexem;
 
 
-public class PrepareReviewsForHIT1 {
+public class PrepareHIT1_WordIdentify {
     private StanfordNLP nlp;
     private BufferedReader reviewInputReader;
     private PrintWriter reviewOuputFileWriter;
@@ -29,12 +29,12 @@ public class PrepareReviewsForHIT1 {
         //PrepareReviewsForHIT1 p = new PrepareReviewsForHIT1("FinalizedReviews\\apparelReviews", "apparel.csv", "ApparelReviewIds.csv");
         //PrepareReviewsForHIT1 p = new PrepareReviewsForHIT1("FinalizedReviews\\bookReviews", "book.csv", "BookReviewIds.csv");
         //PrepareReviewsForHIT1 p = new PrepareReviewsForHIT1("FinalizedReviews\\cameraReviews", "camera.csv", "CameraReviewIds.csv");
-        PrepareReviewsForHIT1 p = new PrepareReviewsForHIT1("FinalizedReviews\\shoesReviews", "shoes2.csv", "ShoesReviewIds2.csv");
+        PrepareHIT1_WordIdentify p = new PrepareHIT1_WordIdentify("FinalizedReviews\\shoesReviews", "shoes2.csv", "ShoesReviewIds2.csv");
 
         p.prepare();
     }
 
-    public PrepareReviewsForHIT1(String reviewFile, String reviewOutputFile, String reviewIdOutputFile) throws Exception {
+    public PrepareHIT1_WordIdentify(String reviewFile, String reviewOutputFile, String reviewIdOutputFile) throws Exception {
         nlp = StanfordNLP.createLemmaTagger();
         reviewInputReader = new BufferedReader(new FileReader(reviewFile));
         reviewOuputFileWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(reviewOutputFile), "UTF-8")));

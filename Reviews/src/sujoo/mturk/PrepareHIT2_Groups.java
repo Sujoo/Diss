@@ -20,7 +20,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-public class PrepareForHIT2 {
+public class PrepareHIT2_Groups {
 
     private BufferedReader wordListReader;
     private PrintWriter hit2Writer;
@@ -32,14 +32,14 @@ public class PrepareForHIT2 {
     private static final int groupsPerHIT = 4;
 
     public static void main(String[] args) throws Exception {
-        PrepareForHIT2 p = new PrepareForHIT2("ReferenceFiles\\ApparelWordList.csv", "HIT2Uploads\\ApparelGroups4.csv");
+        PrepareHIT2_Groups p = new PrepareHIT2_Groups("ReferenceFiles\\ApparelWordList.csv", "HIT2Uploads\\ApparelGroups4.csv");
         p.prepare();
         p.outputFor4WordGroups();
         //p.outputForWordPairs();
         //p.outputPairwise();
     }
 
-    public PrepareForHIT2(String inputFile, String hit2Output) throws Exception {
+    public PrepareHIT2_Groups(String inputFile, String hit2Output) throws Exception {
         wordListReader = new BufferedReader(new FileReader(inputFile));
         hit2Writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(hit2Output), "UTF-8")));
         phraseExamplesMap = ArrayListMultimap.create();

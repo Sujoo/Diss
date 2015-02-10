@@ -24,7 +24,7 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 
-public class ProcessResultsFromHIT2 {
+public class ProcessHIT2_Groups {
     private BufferedReader mTurkResultsReader;
     private BufferedReader wordListReader;
     private PrintWriter groupWriter;
@@ -43,14 +43,14 @@ public class ProcessResultsFromHIT2 {
     // replace "" with "
 
     public static void main(String[] args) throws Exception {
-        ProcessResultsFromHIT2 p = new ProcessResultsFromHIT2("HIT2Downloads\\ApparelGroups3.csv", "ReferenceFiles\\ApparelWordList.csv", "TestGroups.csv");
+        ProcessHIT2_Groups p = new ProcessHIT2_Groups("HIT2Downloads\\ApparelGroups3.csv", "ReferenceFiles\\ApparelWordList.csv", "TestGroups.csv");
         p.prepareIdFile();
         p.process(47, 51);
         // p.processPairs();
         p.outputGroups();
     }
 
-    public ProcessResultsFromHIT2(String inputFile, String wordListFile, String outputFile) throws Exception {
+    public ProcessHIT2_Groups(String inputFile, String wordListFile, String outputFile) throws Exception {
         mTurkResultsReader = new BufferedReader(new FileReader(inputFile));
         wordListReader = new BufferedReader(new FileReader(wordListFile));
         groupWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8")));

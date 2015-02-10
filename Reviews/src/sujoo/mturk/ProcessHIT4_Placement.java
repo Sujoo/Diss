@@ -10,7 +10,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 
-public class ProcessResultsFromHIT4 {
+public class ProcessHIT4_Placement {
     private BufferedReader mTurkResultsReader;
     private BufferedReader wordListReader;
     private BufferedReader groupReader;
@@ -27,13 +27,13 @@ public class ProcessResultsFromHIT4 {
     // replace "" with "
 
     public static void main(String[] args) throws Exception {
-        ProcessResultsFromHIT4 p = new ProcessResultsFromHIT4("HIT4Downloads\\ApparelGroups4-.csv", "ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv");
+        ProcessHIT4_Placement p = new ProcessHIT4_Placement("HIT4Downloads\\ApparelGroups4-.csv", "ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv");
         p.prepare();
         p.processFrom10();
         p.printOutput();
     }
 
-    public ProcessResultsFromHIT4(String inputFile, String inputWordListFile, String inputGroupFile) throws Exception {
+    public ProcessHIT4_Placement(String inputFile, String inputWordListFile, String inputGroupFile) throws Exception {
         mTurkResultsReader = new BufferedReader(new FileReader(inputFile));
         wordListReader = new BufferedReader(new FileReader(inputWordListFile));
         groupReader = new BufferedReader(new FileReader(inputGroupFile));
