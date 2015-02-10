@@ -28,10 +28,11 @@ public class PrepareForHIT2 {
     private ListMultimap<String, String> phraseExamplesMap;
     private Random random;
     private List<String> wordIdsToInclude;
+    private static final int hitsToCreate = 50;
+    private static final int groupsPerHIT = 4;
 
     public static void main(String[] args) throws Exception {
-        PrepareForHIT2 p = new PrepareForHIT2("ReferenceFiles\\ApparelWordList.csv", "HIT2Uploads\\ApparelGroups3.csv");
-        p.setupExtraWordList();
+        PrepareForHIT2 p = new PrepareForHIT2("ReferenceFiles\\ApparelWordList.csv", "HIT2Uploads\\ApparelGroups4.csv");
         p.prepare();
         p.outputFor4WordGroups();
         //p.outputForWordPairs();
@@ -47,11 +48,13 @@ public class PrepareForHIT2 {
     }
     
     public void setupExtraWordList() {
-        String[] words = "15,23,25,26,30,31,34,35,43,45,47,48,51,54,56,57,59,64,65,66,73,80,81,83,84,85,90,93,96,99,105,106,107,110,111,113,116,117,119,122,124,131,134,135,138,140,143,144,146,151,153,158,159,161,163,167,168,169".split(",");
-        wordIdsToInclude = Lists.newArrayList(words);        
+        String words = "35,47,54,57,59,65,66,73,83,84,90,93,96,105,110,117,146,158,159,163,168,171,174,175,181,182,186,194,201,207,212,213,215,216,219,220,223,224,225,229,235,236,240,242,243,245,248,249,251,253,254,255,257,258,259,261,263,266,267,268,273,275,278,279,280,284,289,293,295,296,297,304,306,310,314,317,318,320,327,334,336,339,348,349,351,352,355,356,358,359,361,363,364,371,372,375,376,377,378,380,381,382,383,385,388,389,391,393,395,397,406,408,410,413,417,420,421,422,428,429,431,432,437,439,440,442,443,445,446,447,454,455,458,460,463,465,467,468,470,478,479,481,482,483,486,489,491,500,506,508,512,515,516,517,521,522,524,525,526,527,529,530,532,538,540,545,546,548,549,550,551,553,555,557,558,559,560,561,565,566,567,568,569,570,571,578,579,580,581,582,583,585,589,590,591,592,595,596,598,601,606,607,608,609,611,615,616,617,618,621,623,624,627,628,630,631,633,638,639,640,642,644,648,650,653,655,656,658,661,662,664,667,669,671,674,675,677,679,680,683,685,686,687,689,690,691,693,695,697,700,703,704,705,709,710,717,718,719,722,723,725,729,730,733,735,736,737,738,741,743,745,747,748,750,755,758,759,760,761,764,766,768,769,776,777,779,784,785,787,788,791,792,793,794,798,799,800,802,809,810,811,812,813,815,816,817,818,823,824,825,826,827,832,839,840,843,846,850,851,854,856,859,860,862,863,865,870,871,873,874,876,877,879,882,883,884,885,890,892,898,900,901,902,903,904,907,908,911,914,916,918,919,920,924,926,928,931,935,937,940,941,944,946,948,950,951,953,956,958,960,962,964,966,968";
+        wordIdsToInclude = Lists.newArrayList(words.split(","));        
     }
 
     public void prepare() throws Exception {
+        setupExtraWordList();
+        
         String currentLine = null;
         currentLine = wordListReader.readLine();
         while ((currentLine = wordListReader.readLine()) != null) {
@@ -59,7 +62,7 @@ public class PrepareForHIT2 {
             String[] fields = currentLine.split("\t");
             String id = fields[0];
             String phrase = fields[1];
-            String reviewIds = fields[2];
+            // String reviewIds = fields[2];
             String frags = fields[3];
 
             String key = id + "_" + phrase;
@@ -93,9 +96,14 @@ public class PrepareForHIT2 {
     }
 
     public void outputFor4WordGroups() {
-        hit2Writer.println("g11,g12,g13,g14,g21,g22,g23,g24,g31,g32,g33,g34,g41,g42,g43,g44,g51,g52,g53,g54");
-        for (int i = 1; i <= 20; i++) {
-            for (int j = 1; j <= 5; j++) {
+        String header = "";
+        for (int i = 1; i <= groupsPerHIT; i++) {
+            header += "g" + i + "1,g" + i + "2,g" + i + "3,g" + i + "4,";
+        }
+
+        hit2Writer.println(header.substring(0, header.length()-1));
+        for (int i = 1; i <= hitsToCreate; i++) {
+            for (int j = 1; j <= groupsPerHIT; j++) {
                 print4WordGroup("g" + j);
                 hit2Writer.print(",");
                 System.out.print("g" + j + " ");

@@ -30,9 +30,10 @@ public class PrepareForHIT3 {
     private Map<Integer, String> wordListMap;
     private ListMultimap<Integer, Integer> groupWordMap;
     private Random random;
+    private static final int wordsPerRow = 7;
 
     public static void main(String[] args) throws Exception {
-        PrepareForHIT3 p = new PrepareForHIT3("ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv", "HIT3Uploads\\ApparelGroups3.csv");
+        PrepareForHIT3 p = new PrepareForHIT3("ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv", "HIT3Uploads\\ApparelGroups4.csv");
         p.prepare();
         p.outputForInitialGroupValidation();
     }
@@ -124,7 +125,7 @@ public class PrepareForHIT3 {
             }
             hit3Writer.print("<td>" + getCellHTML(groupName, wordId) + "</td>");
             counter++;
-            if (counter == 3) {
+            if (counter == wordsPerRow) {
                 hit3Writer.print("</tr>");
                 counter = 0;
             }

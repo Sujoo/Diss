@@ -22,12 +22,7 @@ public class MTurkUtils {
     private static ListMultimap<Integer, Integer> wordReviewMap;
 
     public static void main(String[] args) throws Exception {
-        //cleanFile();
         printApparelGroups();
-    }
-    
-    public static void cleanFile() throws Exception {
-        cleanMTurkOutputFile("HIT4Downloads\\ApparelGroups4.csv","HIT4Downloads\\ApparelGroups4-.csv");
     }
 
     public static void printApparelGroups() throws Exception {
@@ -35,13 +30,13 @@ public class MTurkUtils {
         // readGroups("ReferenceFiles\\ApparelWordList.csv", "TestGroups.csv");
         printGroups();
         // findOddPhrases();
-        // findMissingWords();
+        findMissingWords();
         // findMissingReviews();
     }
 
-    public static void cleanMTurkOutputFile(String inputFileName, String outputFileName) throws Exception {
+    public static void cleanMTurkOutputFile(String inputFileName) throws Exception {
         BufferedReader fileReader = new BufferedReader(new FileReader(inputFileName));
-        PrintWriter fileWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileName), "UTF-8")));
+        PrintWriter fileWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(inputFileName + ".csv"), "UTF-8")));
         String currentLine = null;
         while ((currentLine = fileReader.readLine()) != null) {
             // replace "," with \t
@@ -156,7 +151,7 @@ public class MTurkUtils {
             }
         }
 
-        System.out.println(reviewIds.size());
+        System.out.println("Reviews used by groups: " + reviewIds.size());
     }
 
 }

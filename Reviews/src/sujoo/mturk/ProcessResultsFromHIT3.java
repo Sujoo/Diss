@@ -7,12 +7,12 @@ import java.util.Set;
 
 import org.json.JSONArray;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultiset;
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
+import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+import com.google.common.collect.TreeMultimap;
 
 public class ProcessResultsFromHIT3 {
     private BufferedReader mTurkResultsReader;
@@ -20,7 +20,7 @@ public class ProcessResultsFromHIT3 {
     private BufferedReader groupReader;
 
     private Map<Integer, String> wordListMap;
-    private ListMultimap<Integer, Integer> groupWordMap;
+    private SetMultimap<Integer, Integer> groupWordMap;
     private Multiset<Integer> okGroups;
     private Map<Integer, Multiset<Integer>> wordsDontBelongInGroup;
     private Set<Integer> groupIds;
@@ -32,7 +32,7 @@ public class ProcessResultsFromHIT3 {
     // replace "" with "
 
     public static void main(String[] args) throws Exception {
-        ProcessResultsFromHIT3 p = new ProcessResultsFromHIT3("HIT3Downloads\\ApparelGroups2a.csv", "ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv");
+        ProcessResultsFromHIT3 p = new ProcessResultsFromHIT3("HIT3Downloads\\ApparelGroups4.csv", "ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv");
         p.prepare();
         p.processFrom1PerHIT();
         p.writeOutput();
@@ -44,10 +44,10 @@ public class ProcessResultsFromHIT3 {
         groupReader = new BufferedReader(new FileReader(inputGroupFile));
 
         wordListMap = Maps.newHashMap();
-        groupWordMap = ArrayListMultimap.create();
+        groupWordMap = TreeMultimap.create();
         okGroups = HashMultiset.create();
         wordsDontBelongInGroup = Maps.newHashMap();
-        groupIds = Sets.newHashSet();
+        groupIds = Sets.newTreeSet();
     }
 
     public void prepare() throws Exception {
