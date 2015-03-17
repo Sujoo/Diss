@@ -27,7 +27,7 @@ public class ProcessHIT4_Placement {
     // replace "" with "
 
     public static void main(String[] args) throws Exception {
-        ProcessHIT4_Placement p = new ProcessHIT4_Placement("HIT4Downloads\\ApparelGroups4-.csv", "ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv");
+        ProcessHIT4_Placement p = new ProcessHIT4_Placement("HIT4Downloads\\ApparelGroups4a.csv", "ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\TailApparelGroups.csv");
         p.prepare();
         p.processFrom10();
         p.printOutput();

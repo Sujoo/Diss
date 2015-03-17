@@ -140,7 +140,7 @@ public class ProcessHIT3_Validate {
             String[] hitResult = currentLine.split("\t");
             int g1Id = Integer.parseInt(hitResult[27]);
             if (hitResult.length < 30) {
-                System.out.println("Turker FAIL: " + g1Id);
+                System.out.println("Not enough turker inputs for group: " + g1Id);
             } else {
                 groupIds.add(g1Id);
                 String allBelongG1 = hitResult[29];
@@ -173,20 +173,21 @@ public class ProcessHIT3_Validate {
                 wordsDontBelongInGroup.get(groupId).add(wordId);
             }
         } else {
-            System.out.println("Turker FAIL: " + groupId);
+            System.out.println("Not enough selected terms or checkbox and term for group: " + groupId);
         }
     }
     
     public void writeOutput() {
         for (Integer groupId : groupIds) {
             System.out.println("Group: " + groupId);
-            if (okGroups.count(groupId) > 3) {
+            if (okGroups.count(groupId) == 5) {
                 System.out.println("**Excellent : " + okGroups.count(groupId) + "**");
             } else {
                 for (Integer wordId : groupWordMap.get(groupId)) {
                     System.out.print(wordListMap.get(wordId) + ", ");
                 }
                 System.out.println();
+                System.out.println("Good Group Votes: " + okGroups.count(groupId));
                 System.out.print("Words Dont Belong: ");
                 if (wordsDontBelongInGroup.containsKey(groupId)) {
                     for (Integer wordId : wordsDontBelongInGroup.get(groupId).elementSet()) {

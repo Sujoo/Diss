@@ -7,31 +7,80 @@ import java.io.FileReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import com.google.common.collect.TreeMultimap;
 
 public class MTurkUtils {
 
     private static Map<Integer, String> wordListMap;
     private static Map<Integer, String> wordListFullMap;
-    private static ListMultimap<Integer, Integer> groupWordMap;
+    private static Multimap<Integer, Integer> groupWordMap;
     private static ListMultimap<Integer, Integer> wordReviewMap;
+    private static ListMultimap<Integer, String> phraseExamplesMap;
+    private static Random random = new Random();
 
     public static void main(String[] args) throws Exception {
         printApparelGroups();
+        //printBookGroups();
+        //printCameraGroups();
     }
-
+    
     public static void printApparelGroups() throws Exception {
         readGroups("ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv");
-        // readGroups("ReferenceFiles\\ApparelWordList.csv", "TestGroups.csv");
+
         printGroups();
         // findOddPhrases();
         findMissingWords();
         // findMissingReviews();
+    }
+
+    public static void printCameraGroups() throws Exception {
+        readGroups("ReferenceFiles\\CameraWordList.csv", "ReferenceFiles\\TempCameraGroups.csv");
+
+        printGroups();
+        // findOddPhrases();
+        findMissingWords();
+        // findMissingReviews();
+    }
+
+    public static void printBookGroups() throws Exception {
+        readGroups("ReferenceFiles\\BookWordList.csv", "ReferenceFiles\\BookGroups.csv");
+
+        printGroups();
+        // findOddPhrases();
+        findMissingWords();
+        // findMissingReviews();
+    }
+    
+    public static void readApparel() throws Exception {
+        readGroups("ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv");
+    }
+    
+    public static void readCamera() throws Exception {
+        readGroups("ReferenceFiles\\CameraWordList.csv", "ReferenceFiles\\CameraGroups.csv");
+    }
+    
+    public static void readBooks() throws Exception {
+        readGroups("ReferenceFiles\\BookWordList.csv", "ReferenceFiles\\BookGroups.csv");
+    }
+    
+    public static Map<Integer, String> getWordListMap() {
+        return wordListMap;
+    }
+    
+    public static Multimap<Integer, Integer> getGroupWordMap() {
+        return groupWordMap;
+    }
+    
+    public static ListMultimap<Integer, String> getPhraseExamplesMap() {
+        return phraseExamplesMap;
     }
 
     public static void cleanMTurkOutputFile(String inputFileName) throws Exception {
@@ -58,8 +107,9 @@ public class MTurkUtils {
     public static void readGroups(String wordListFile, String groupFile) throws Exception {
         wordListMap = Maps.newTreeMap();
         wordListFullMap = Maps.newTreeMap();
-        groupWordMap = ArrayListMultimap.create();
+        groupWordMap = TreeMultimap.create();
         wordReviewMap = ArrayListMultimap.create();
+        phraseExamplesMap = ArrayListMultimap.create();
         BufferedReader wordListReader = new BufferedReader(new FileReader(wordListFile));
         BufferedReader groupReader = new BufferedReader(new FileReader(groupFile));
 
@@ -70,18 +120,41 @@ public class MTurkUtils {
             String wordId = fields[0];
             String phrase = fields[1];
             String reviewIdList = fields[2];
-            int w = Integer.parseInt(wordId);
-            if (wordListMap.keySet().contains(w)) {
-                System.out.println("duplicate id: " + w);
+            String frags = fields[3];
+            int id = Integer.parseInt(wordId);
+            if (wordListMap.keySet().contains(id)) {
+                System.out.println("duplicate id: " + id);
             }
-            wordListMap.put(Integer.parseInt(wordId), phrase);
-            wordListFullMap.put(Integer.parseInt(wordId), currentLine);
+            wordListMap.put(id, phrase);
+            wordListFullMap.put(id, currentLine);
             String[] reviewIds = reviewIdList.split(",");
             for (String reviewId : reviewIds) {
                 if (Integer.parseInt(reviewId) > 500) {
                     System.out.println("bad reviewId <" + reviewId + ">: " + currentLine);
                 }
-                wordReviewMap.put(Integer.parseInt(wordId), Integer.parseInt(reviewId));
+                wordReviewMap.put(id, Integer.parseInt(reviewId));
+            }
+            
+            String[] examples = frags.split(",");
+            if (examples.length > 3) {
+                int one = random.nextInt(examples.length);
+                int two = random.nextInt(examples.length);
+                int three = random.nextInt(examples.length);
+
+                while (two == one) {
+                    two = random.nextInt(examples.length);
+                }
+                while (three == two || three == one) {
+                    three = random.nextInt(examples.length);
+                }
+
+                phraseExamplesMap.put(id, examples[one]);
+                phraseExamplesMap.put(id, examples[two]);
+                phraseExamplesMap.put(id, examples[three]);
+            } else {
+                for (int i = 0; i < examples.length; i++) {
+                    phraseExamplesMap.put(id, examples[i]);
+                }
             }
         }
         wordListReader.close();
@@ -135,9 +208,10 @@ public class MTurkUtils {
         int i = 0;
         for (Integer wordId : wordListMap.keySet()) {
             String phrase = wordListMap.get(wordId);
-            if (phrase.split(" ").length >= 4) {
+            if (phrase.split(" ").length == 2) {
                 i++;
-                System.out.println(wordId + "\t" + wordListFullMap.get(wordId));
+                //System.out.println(wordListFullMap.get(wordId));
+                System.out.println(wordId + "\t" + wordListMap.get(wordId));
             }
         }
         System.out.println(i + " odd words found");

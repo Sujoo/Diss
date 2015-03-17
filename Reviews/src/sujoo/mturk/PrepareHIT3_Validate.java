@@ -17,11 +17,11 @@ import com.google.common.collect.Maps;
 
 /**
  * Identify words that do not belong
- *
+ * 
  */
 
 public class PrepareHIT3_Validate {
-    
+
     private BufferedReader wordListReader;
     private BufferedReader groupReader;
     private PrintWriter hit3Writer;
@@ -33,7 +33,8 @@ public class PrepareHIT3_Validate {
     private static final int wordsPerRow = 7;
 
     public static void main(String[] args) throws Exception {
-        PrepareHIT3_Validate p = new PrepareHIT3_Validate("ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv", "HIT3Uploads\\ApparelGroups4.csv");
+        PrepareHIT3_Validate p = new PrepareHIT3_Validate("ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\TailApparelGroups.csv",
+                "HIT3Uploads\\ApparelGroups4a.csv");
         p.prepare();
         p.outputForInitialGroupValidation();
     }
@@ -42,7 +43,7 @@ public class PrepareHIT3_Validate {
         wordListReader = new BufferedReader(new FileReader(inputWordListFile));
         groupReader = new BufferedReader(new FileReader(inputGroupFile));
         hit3Writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(hit3Output), "UTF-8")));
-        
+
         phraseExamplesMap = ArrayListMultimap.create();
         wordListMap = Maps.newHashMap();
         groupWordMap = ArrayListMultimap.create();
@@ -85,33 +86,30 @@ public class PrepareHIT3_Validate {
             }
         }
         wordListReader.close();
-        
+
         currentLine = null;
         currentLine = groupReader.readLine();
         while ((currentLine = groupReader.readLine()) != null) {
-            // GroupId  Words
+            // GroupId Words
             String[] fields = currentLine.split("\t");
             int id = Integer.parseInt(fields[0]);
             String[] wordIds = fields[1].split(",");
             for (int i = 0; i < wordIds.length; i++) {
-                groupWordMap.put(id, Integer.parseInt(wordIds[i]));            }
+                groupWordMap.put(id, Integer.parseInt(wordIds[i]));
+            }
         }
         groupReader.close();
     }
 
-    public void outputForInitialGroupValidation() {        
-        //hit3Writer.println("g1Id,g2Id,g3Id,g1,g2,g3");
+    public void outputForInitialGroupValidation() {
+        // hit3Writer.println("g1Id,g2Id,g3Id,g1,g2,g3");
         hit3Writer.println("g1Id,g1");
-        Iterator<Integer> itr = groupWordMap.keySet().iterator();
-        while (itr.hasNext()) {
-            int g1Id = itr.next();
-            //int g2Id = itr.next();
-            //int g3Id = itr.next();
-            hit3Writer.print(g1Id);// + "," + g2Id + "," + g3Id);
-            printGroupTable(g1Id, "g1");
-            //printGroupTable(g2Id, "g2");
-            //printGroupTable(g3Id, "g3");
-            hit3Writer.println();
+        for (int groupId : groupWordMap.keySet()) {
+            if (groupWordMap.get(groupId).size() > 2) {
+                hit3Writer.print(groupId);
+                printGroupTable(groupId, "g1");
+                hit3Writer.println();
+            }
         }
         hit3Writer.close();
     }
