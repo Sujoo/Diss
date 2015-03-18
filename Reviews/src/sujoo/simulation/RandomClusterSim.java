@@ -15,22 +15,28 @@ public class RandomClusterSim {
 
     public static void main(String[] args) {
         // # words, # groups, # clusters, words per cluster
-        RandomClusterSim sim = new RandomClusterSim(10, 3, 40, 12);
-
+        multiSimulations(new RandomClusterSim(100, 5, 20, 16), false, 1000);
+        multiSimulations(new RandomClusterSim(100, 5, 40, 16), false, 1000);
+    }
+    
+    public static void multiSimulations(RandomClusterSim sim, boolean even, int simulationCount) {
         int correctCounter = 0;
-        int simulations = 1;
-        for (int i = 0; i < simulations; i++) {
-            if (simulate(sim)) {
+        for (int i = 0; i < simulationCount; i++) {
+            if (simulate(sim, even)) {
                 correctCounter++;
             }
         }
 
-        System.out.println(correctCounter + " / " + simulations);
+        System.out.println(correctCounter + " / " + simulationCount);
     }
 
-    public static boolean simulate(RandomClusterSim sim) {
+    public static boolean simulate(RandomClusterSim sim, boolean even) {
         sim.init();
-        sim.createUnevenGroups();
+        if (even) {
+            sim.createEvenGroups();
+        } else {
+            sim.createUnevenGroups();
+        }
         sim.createClusters();
         return sim.checkClusters();
     }
@@ -79,36 +85,43 @@ public class RandomClusterSim {
 
         // printArray(words);
     }
-    
+
     public void createUnevenGroups() {
-        int wordsLeft = numberOfWords;
-        int randNums[] = new int[wordsLeft], sum = 0;
-
-        for (int i = 0; i < randNums.length; i++) {
-            randNums[i] = random.nextInt();
-            sum += randNums[i];
+        int[] groupSizes = new int[numberOfGroups - 1];
+        int nextRandomMin = 2;
+        for (int i = 0; i < numberOfGroups - 1; i++) {
+            int bit = (numberOfGroups - (i + 1)) * 2;
+            int nextRandomMax = numberOfWords - bit;
+            int nextIntThing = (nextRandomMax - nextRandomMin) + 1;
+            int groupIndex = random.nextInt(nextIntThing) + nextRandomMin;
+            nextRandomMin = groupIndex + 2;
+            groupSizes[i] = groupIndex;
         }
-
-        for (int i = 0; i < randNums.length; i++) {
-            randNums[i] /= sum * wordsLeft;
-        }
         
-        printArray(randNums);
-        
-        
-        for (int i = 1; i <= numberOfGroups; i++) {
-            int wordsPerThisGroup = random.nextInt(wordsLeft - (numberOfGroups*2)) + 2;
-            System.out.println("G" + i + ":" + wordsPerThisGroup);
+        int prev = 0;
+        for (int i = 0; i < groupSizes.length; i++) {
+            int wordsInGroup = groupSizes[i] - prev;
             int wordsPlaced = 0;
-            while (wordsPlaced < wordsPerThisGroup) {
+            while (wordsPlaced < wordsInGroup) {
                 int wordIndex = random.nextInt(words.length);
-                if (words[wordIndex] == 0 && words[wordIndex] != i) {
-                    words[wordIndex] = i;
+                if (words[wordIndex] == 0 && words[wordIndex] != i+1) {
+                    words[wordIndex] = i+1;
                     wordsPlaced++;
                 }
             }
+            prev = groupSizes[i];
+        }
+        int wordsInGroup = numberOfWords - prev;
+        int wordsPlaced = 0;
+        while (wordsPlaced < wordsInGroup) {
+            int wordIndex = random.nextInt(words.length);
+            if (words[wordIndex] == 0 && words[wordIndex] != numberOfGroups) {
+                words[wordIndex] = numberOfGroups;
+                wordsPlaced++;
+            }
         }
 
+        // printArray(groupSizes);
         // printArray(words);
     }
 
@@ -202,11 +215,11 @@ public class RandomClusterSim {
             }
         }
 
-//        System.out.println("True Groups:");
-//        printTrueGroups();
-//
-//        System.out.println("Groups Found:");
-//        System.out.println(groups);
+        // System.out.println("True Groups:");
+        // printTrueGroups();
+        //
+        // System.out.println("Groups Found:");
+        // System.out.println(groups);
 
         boolean[] partOfGroupFound = new boolean[numberOfGroups];
         for (Set<Integer> group : groups) {
