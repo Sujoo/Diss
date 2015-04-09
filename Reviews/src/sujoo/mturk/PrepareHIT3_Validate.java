@@ -105,7 +105,7 @@ public class PrepareHIT3_Validate {
         // hit3Writer.println("g1Id,g2Id,g3Id,g1,g2,g3");
         hit3Writer.println("g1Id,g1");
         for (int groupId : groupWordMap.keySet()) {
-            if (groupWordMap.get(groupId).size() > 2) {
+            if (groupWordMap.get(groupId).size() > 1) {
                 hit3Writer.print(groupId);
                 printGroupTable(groupId, "g1");
                 hit3Writer.println();

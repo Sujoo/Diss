@@ -158,7 +158,7 @@ public class ProcessHIT3_Validate {
     }
     
     public void checkResult(int groupId, String allBelong, String wordIds) {        
-        if (allBelong.equals("1") && (wordIds.equals("") || wordIds.equals("[]"))) {
+        if (allBelong.equals("1") && (wordIds.equals("") || wordIds.equals("[]") || wordIds.equals("{}"))) {
             // All words belong in this group
             okGroups.add(groupId);
         } else if (allBelong.equals("") && wordIds.length() > 2) {

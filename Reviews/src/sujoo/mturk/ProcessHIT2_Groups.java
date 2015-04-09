@@ -7,23 +7,19 @@ import java.io.FileReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.HashMultiset;
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 
 public class ProcessHIT2_Groups {
@@ -32,18 +28,17 @@ public class ProcessHIT2_Groups {
     private PrintWriter groupWriter;
     private Map<Integer, String> wordListMap;
 
-    private ListMultimap<String, String> selectedWords;
+    private Map<String, Set<Integer>> allWordsInHIT;
+    private Map<String, Multiset<List<Integer>>> selectedTuplesInHIT;
 
-    private Set<List<Integer>> selectedWordPairs;
-    private SetMultimap<String, Integer> wordsInHIT;
-    private Set<List<Integer>> allNonSelectedTuples;
+    private Set<List<Integer>> selectedTuples;
+    private Set<List<Integer>> nonSelectedTuples;
 
     public static void main(String[] args) throws Exception {
-        ProcessHIT2_Groups p = new ProcessHIT2_Groups("HIT2Downloads\\ApparelGroups4.csv", "ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\TestGroups.csv");
+        ProcessHIT2_Groups p = new ProcessHIT2_Groups("HIT2Downloads\\ApparelGroups4.csv", "ReferenceFiles\\ApparelWordList.csv",
+                "ReferenceFiles\\TestGroups.csv");
         p.prepareIdFile();
-        // p.processSingleGroupHIT();
-        p.process();
-        // p.processPairs();
+        p.processSingleGroupHIT();
         p.outputGroups();
     }
 
@@ -53,10 +48,10 @@ public class ProcessHIT2_Groups {
         groupWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8")));
 
         wordListMap = Maps.newHashMap();
-        selectedWords = ArrayListMultimap.create();
-        wordsInHIT = HashMultimap.create();
-        selectedWordPairs = Sets.newHashSet();
-        allNonSelectedTuples = Sets.newHashSet();
+        selectedTuplesInHIT = Maps.newHashMap();
+        allWordsInHIT = Maps.newHashMap();
+        selectedTuples = Sets.newHashSet();
+        nonSelectedTuples = Sets.newHashSet();
     }
 
     public void prepareIdFile() throws Exception {
@@ -72,64 +67,6 @@ public class ProcessHIT2_Groups {
         }
 
         wordListReader.close();
-    }
-
-    public void process() throws Exception {
-        // 0 HITId 1 HITTypeId 2 Title 3 Description 4 Keywords 5 Reward 6
-        // CreationTime 7 MaxAssignments 8 RequesterAnnotation
-        // 9 AssignmentDurationInSeconds 10 AutoApprovalDelayInSeconds 11
-        // Expiration 12 NumberOfSimilarHITs 13 LifetimeInSeconds 14
-        // AssignmentId
-        // 15 WorkerId 16 AssignmentStatus 17 AcceptTime 18 SubmitTime 19
-        // AutoApprovalTime 20 ApprovalTime 21 RejectionTime
-        // 22 RequesterFeedback 23 WorkTimeInSeconds 24 LifetimeApprovalRate 25
-        // Last30DaysApprovalRate 26 Last7DaysApprovalRate
-        // 27 Input.g1  28 Input.g2    29 Input.g3    30 Input.g4    31 Input.g5
-        // 32 Answer.G1   33 Answer.G2   34 Answer.G3   35 Answer.G4   36 Answer.G5
-        // 37 Answer.keyphrases1  38 Answer.keyphrases2  39 Answer.keyphrases3  40 Answer.keyphrases4  41 Answer.keyphrases5
-        int startingIndex = 37;
-        int endingIndex = 41;
-
-        String currentLine = null;
-        currentLine = mTurkResultsReader.readLine();
-        while ((currentLine = mTurkResultsReader.readLine()) != null) {
-            String[] hitResult = currentLine.split("\t");
-            String HITId = hitResult[0];
-            addToWordsInHIT(HITId, hitResult[27], 1);
-            addToWordsInHIT(HITId, hitResult[28], 2);
-            addToWordsInHIT(HITId, hitResult[29], 3);
-            addToWordsInHIT(HITId, hitResult[30], 4);
-            addToWordsInHIT(HITId, hitResult[31], 5);
-            
-            if (hitResult.length < 42) {
-                System.out.println("Turker did not provide any inputs: " + HITId + " : " + hitResult[15]);
-            } else {
-                int counter = 1;
-                for (int i = startingIndex; i <= endingIndex; i++) {
-                    if (!hitResult[i-5].equals("1")) {
-                        String jsonString = hitResult[i];
-                        JSONArray arr = new JSONArray(jsonString);
-                        String selectedIndexes = "";
-                        for (int j = 0; j < arr.length(); j++) {
-                            selectedIndexes += arr.getJSONObject(j).getString("index") + ",";
-                        }
-                        if (!selectedIndexes.equals("")) {
-                            selectedWords.put(HITId + "_" + counter, selectedIndexes.substring(0, selectedIndexes.length() - 1));
-                        }
-                        counter++;
-                    }
-                }
-            }
-        }
-
-        mTurkResultsReader.close();
-    }
-    
-    public void addToWordsInHIT(String HITId, String inputTable, int groupNumber) {
-        Matcher m = Pattern.compile("id=\\d{1,3}").matcher(inputTable);
-        while (m.find()) {
-            wordsInHIT.put(HITId + "_" + groupNumber, Integer.parseInt(m.group(0).split("=")[1]));
-        }
     }
 
     public void processSingleGroupHIT() throws Exception {
@@ -150,70 +87,48 @@ public class ProcessHIT2_Groups {
             String[] hitResult = currentLine.split("\t");
             String HITId = hitResult[0];
             String inputTable = hitResult[27];
-            Matcher m = Pattern.compile("id=\\d{1,3}").matcher(inputTable);
-            while (m.find()) {
-                wordsInHIT.put(HITId + "_" + 1, Integer.parseInt(m.group(0).split("=")[1]));
+            if (!allWordsInHIT.containsKey(HITId)) {
+                allWordsInHIT.put(HITId, new HashSet<Integer>());
+                Multiset<List<Integer>> ms = HashMultiset.create();
+                selectedTuplesInHIT.put(HITId, ms);
+                Matcher m = Pattern.compile("id=\\d{1,3}").matcher(inputTable);
+                // Put all of the words from a HIT into this set, if we haven't
+                // done so yet
+                while (m.find()) {
+                    allWordsInHIT.get(HITId).add(Integer.parseInt(m.group(0).split("=")[1]));
+                }
             }
-            
+
             if (hitResult.length < 29) {
                 System.out.println("Turker did not provide any inputs: " + HITId + " : " + hitResult[15]);
-            } else if (!hitResult[28].equals("1")) {
+            } else if (!hitResult[28].equals("1") && !hitResult[29].equals("{}")) {
+                Set<Integer> selectedWords = Sets.newHashSet();
                 String jsonString = hitResult[29];
                 JSONArray arr = new JSONArray(jsonString);
-                String selectedIndexes = "";
                 for (int j = 0; j < arr.length(); j++) {
-                    selectedIndexes += arr.getJSONObject(j).getString("index") + ",";
+                    selectedWords.add(arr.getJSONObject(j).getInt("index"));
                 }
-                if (!selectedIndexes.equals("")) {
-                    selectedWords.put(HITId + "_" + 1, selectedIndexes.substring(0, selectedIndexes.length() - 1));
-                }   
-            }
-
-        }
-
-        mTurkResultsReader.close();
-    }
-
-    public void processPairs() throws Exception {
-        // 0 HITId 1 HITTypeId 2 Title 3 Description 4 Keywords 5 Reward 6
-        // CreationTime 7 MaxAssignments 8 RequesterAnnotation
-        // 9 AssignmentDurationInSeconds 10 AutoApprovalDelayInSeconds 11
-        // Expiration 12 NumberOfSimilarHITs 13 LifetimeInSeconds 14
-        // AssignmentId
-        // 15 WorkerId 16 AssignmentStatus 17 AcceptTime 18 SubmitTime 19
-        // AutoApprovalTime 20 ApprovalTime 21 RejectionTime
-        // 22 RequesterFeedback 23 WorkTimeInSeconds 24 LifetimeApprovalRate 25
-        // Last30DaysApprovalRate 26 Last7DaysApprovalRate
-        // 27 Input.g11 28 Input.g12 29 Input.g21 30 Input.g22
-        // 31 Input.g31 32 Input.g32 33 Input.g41 34 Input.g42
-        // 35 Input.g51 36 Input.g52 37 Input.g61 38 Input.g62
-        // 39 Answer.G1 40 Answer.G2 41 Answer.G3 42 Answer.G4 43 Answer.G5 44
-        // Answer.G6
-
-        String currentLine = null;
-        currentLine = mTurkResultsReader.readLine();
-        while ((currentLine = mTurkResultsReader.readLine()) != null) {
-            int startIndex = 39;
-            int endIndex = 44;
-            int startWordIndex = 27;
-            String[] hitResult = currentLine.split("\t");
-            if (hitResult.length > 44) {
-                int counter = 1;
-                for (int i = startIndex; i <= endIndex; i++) {
-                    int word1 = Integer.parseInt(StringUtils.substringBetween(hitResult[startWordIndex], "id=", ">"));
-                    int word2 = Integer.parseInt(StringUtils.substringBetween(hitResult[startWordIndex + 1], "id=", ">"));
-                    String HITId = hitResult[0];
-                    wordsInHIT.put(HITId + "_" + counter, word1);
-                    wordsInHIT.put(HITId + "_" + counter, word2);
-                    if (hitResult[i].equals("1")) {
-                        selectedWords.put(HITId + "_" + counter, word1 + "," + word2);
+                
+                Set<List<Integer>> currentTask = Sets.newHashSet();
+                if (selectedWords.size() > 1) {
+                    for (int i : selectedWords) {
+                        for (int j : selectedWords) {
+                            if (i != j) {
+                                List<Integer> tuple = Lists.newArrayList();
+                                tuple.add(i);
+                                tuple.add(j);
+                                Collections.sort(tuple);
+                                currentTask.add(tuple);
+                            }
+                        }
                     }
-                    counter++;
-                    startWordIndex += 2;
                 }
-            } else {
-                System.out.println("Le Fail!");
+                
+                for (List<Integer> tuple : currentTask) {
+                    selectedTuplesInHIT.get(HITId).add(tuple);
+                }
             }
+
         }
 
         mTurkResultsReader.close();
@@ -221,73 +136,59 @@ public class ProcessHIT2_Groups {
 
     public void outputGroups() throws Exception {
         // For each group
-        for (String hitId_G : selectedWords.keySet()) {
-            Multiset<List<Integer>> selectedTupleCountSet = HashMultiset.create();
-            // For each response
-            for (String selectedIndexes : selectedWords.get(hitId_G)) {
-                String[] indexes = selectedIndexes.split(",");
-                Set<List<Integer>> selectedTuples = Sets.newHashSet();
-                // Generate all selected tuples
-                for (int i = 0; i < indexes.length; i++) {
-                    for (int j = i + 1; j < indexes.length; j++) {
+        for (String hitId : allWordsInHIT.keySet()) {
+            Set<List<Integer>> allTuples = Sets.newHashSet();
+            Multiset<List<Integer>> selectedHITTuples = selectedTuplesInHIT.get(hitId);
+            // Generate all possible tuples from this cluster
+            for (int i : allWordsInHIT.get(hitId)) {
+                for (int j : allWordsInHIT.get(hitId)) {
+                    if (i != j) {
                         List<Integer> tuple = Lists.newArrayList();
-                        tuple.add(Integer.parseInt(indexes[i]));
-                        tuple.add(Integer.parseInt(indexes[j]));
+                        tuple.add(i);
+                        tuple.add(j);
                         Collections.sort(tuple);
-                        selectedTuples.add(tuple);
+                        allTuples.add(tuple);
                     }
                 }
-                // Generate all tuples
-                for (Integer i : wordsInHIT.get(hitId_G)) {
-                    for (Integer j : wordsInHIT.get(hitId_G)) {
-                        if (i != j) {
-                            List<Integer> tuple = Lists.newArrayList();
-                            tuple.add(i);
-                            tuple.add(j);
-                            Collections.sort(tuple);
-                            allNonSelectedTuples.add(tuple);
-                        }
+            }
+            
+            // Find all selected Tuples
+            Set<Integer> selectedWords = Sets.newHashSet();
+            for (List<Integer> tuple : selectedHITTuples) {
+                if (selectedHITTuples.count(tuple) >= 3) {
+                    selectedTuples.add(tuple);
+                    if (tuple.contains(8) && tuple.contains(14)) {
+                        System.out.println(wordListMap.get(tuple.get(0)) + ", " + wordListMap.get(tuple.get(1)));
                     }
-                }
-
-                // Add selected tuples to total group count
-                for (List<Integer> tuple : selectedTuples) {
-                    selectedTupleCountSet.add(tuple);
+                    selectedWords.add(tuple.get(0));
+                    selectedWords.add(tuple.get(1));
+                    allTuples.remove(tuple);
                 }
             }
-            // System.out.println("All Tuples");
-            // System.out.println(allNonSelectedTuples);
-            // System.out.println("Selected Tuples");
-            // Identify tuples selected by 3 or more turkers per group
-            for (List<Integer> tuple : selectedTupleCountSet.elementSet()) {
-                // System.out.println(tuple + " : " +
-                // selectedTupleCountSet.count(tuple));
-                if (selectedTupleCountSet.count(tuple) >= 3) {
-                    selectedWordPairs.add(tuple);
+            
+            for (List<Integer> tuple : allTuples) {
+                if (selectedWords.contains(tuple.get(0)) || selectedWords.contains(tuple.get(1))) {
+                    if (tuple.contains(8) && tuple.contains(14)) {
+                        System.out.println(wordListMap.get(tuple.get(0)) + ", " + wordListMap.get(tuple.get(1)));
+                    }
+                    nonSelectedTuples.add(tuple);
                 }
             }
-            // System.out.println("Final Selected");
-            // System.out.println(selectedWordPairs);
-            // System.out.println("Final Non Selected");
-            // System.out.println(allNonSelectedTuples);
-            // System.out.println();
+            
         }
-
-        for (List<Integer> tuple : selectedWordPairs) {
-            allNonSelectedTuples.remove(tuple);
+        
+        for (List<Integer> tuple : selectedTuples) {
+            if (nonSelectedTuples.contains(tuple)) {
+                nonSelectedTuples.remove(tuple);
+            }
         }
-
-        System.out.println("Final Selected: " + selectedWordPairs.size());
-        System.out.println(selectedWordPairs);
-        System.out.println("Final Non Selected: " + allNonSelectedTuples.size());
-        System.out.println(allNonSelectedTuples);
 
         List<Set<Integer>> groups = Lists.newArrayList();
-        for (List<Integer> selectedTuple : selectedWordPairs) {
-            if (!allNonSelectedTuples.contains(selectedTuple)) {
+        for (List<Integer> selectedTuple : selectedTuples) {
+            if (!nonSelectedTuples.contains(selectedTuple)) {
                 addSetToList(Sets.newHashSet(selectedTuple), groups);
             } else {
-                System.out.println(selectedTuple);
+                System.out.println("wtf" + selectedTuple);
             }
         }
 
@@ -310,17 +211,17 @@ public class ProcessHIT2_Groups {
         }
         groupWriter.close();
 
-        Set<Integer> allWords = Sets.newHashSet(wordsInHIT.values());
-        System.out.println("All Words Used in HIT");
-        System.out.println(allWords.size());
-        System.out.println(allWords);
+        //Set<Integer> allWords = wordsInHIT.;
+        //System.out.println("All Words Used in HIT");
+        //System.out.println(allWords.size());
+        //System.out.println(allWords);
         System.out.println("# Words placed into groups: " + wordsInGroup.size());
         System.out.println("Words not placed into groups:");
-        for (Integer word : allWords) {
-            if (!wordsInGroup.contains(word)) {
-                System.out.print(word + ",");
-            }
-        }
+//        for (Integer word : allWords) {
+//            if (!wordsInGroup.contains(word)) {
+//                System.out.print(word + ",");
+//            }
+//        }
     }
 
     public void addSetToList(Set<Integer> newGroup, List<Set<Integer>> groups) {
@@ -346,8 +247,8 @@ public class ProcessHIT2_Groups {
                 tuple.add(i);
                 tuple.add(j);
                 Collections.sort(tuple);
-                if (allNonSelectedTuples.contains(tuple)) {
-                    System.out.println("G1:" + group1 + "\tG2:" + group2 + "\tBadTuple:" + tuple);
+                if (nonSelectedTuples.contains(tuple)) {
+                    System.out.println("G1:" + group1 + "\tG2:" + group2 + "\tBadTuple: " + wordListMap.get(tuple.get(0)) + ", " + wordListMap.get(tuple.get(1)));
                     return false;
                 }
             }

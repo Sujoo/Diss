@@ -1,5 +1,6 @@
 package sujoo.simulation;
 
+import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -12,14 +13,27 @@ import com.google.common.collect.Multisets;
 import com.google.common.collect.Sets;
 
 public class RandomClusterSim {
+    
+    public static final DecimalFormat df = new DecimalFormat("0.##");
 
     public static void main(String[] args) {
+        int wordsPer = 12;
+        int simCount = 1000;
+        int words = 50;
+        int clusters = 20;
+        int[] numberOfGroupsList = new int[]{20,10,5};
+        for (int i = 1; i < words+1; i++) {
+            System.out.print(i + ",");
+        }
+        System.out.println();
         // # words, # groups, # clusters, words per cluster
-        multiSimulations(new RandomClusterSim(100, 5, 20, 16), false, 1000);
-        multiSimulations(new RandomClusterSim(100, 5, 40, 16), false, 1000);
+        for (int i = 0; i < numberOfGroupsList.length; i++) {            
+            multiSimulations(new RandomClusterSim(words, numberOfGroupsList[i], clusters, wordsPer), false, simCount);
+        }
     }
-    
+
     public static void multiSimulations(RandomClusterSim sim, boolean even, int simulationCount) {
+        System.out.print(sim.numberOfWords + "," + sim.numberOfGroups + "," + sim.numberOfClusters + "," + sim.wordsPerCluster + ",");
         int correctCounter = 0;
         for (int i = 0; i < simulationCount; i++) {
             if (simulate(sim, even)) {
@@ -27,7 +41,7 @@ public class RandomClusterSim {
             }
         }
 
-        System.out.println(correctCounter + " / " + simulationCount);
+        System.out.println(df.format(((double) correctCounter / (double) simulationCount) * 100));
     }
 
     public static boolean simulate(RandomClusterSim sim, boolean even) {
@@ -97,15 +111,15 @@ public class RandomClusterSim {
             nextRandomMin = groupIndex + 2;
             groupSizes[i] = groupIndex;
         }
-        
+
         int prev = 0;
         for (int i = 0; i < groupSizes.length; i++) {
             int wordsInGroup = groupSizes[i] - prev;
             int wordsPlaced = 0;
             while (wordsPlaced < wordsInGroup) {
                 int wordIndex = random.nextInt(words.length);
-                if (words[wordIndex] == 0 && words[wordIndex] != i+1) {
-                    words[wordIndex] = i+1;
+                if (words[wordIndex] == 0 && words[wordIndex] != i + 1) {
+                    words[wordIndex] = i + 1;
                     wordsPlaced++;
                 }
             }
@@ -172,13 +186,23 @@ public class RandomClusterSim {
             }
 
             // Create list of selected words from largest group
-            int largestGroup = Multisets.copyHighestCountFirst(groupCounter).elementSet().iterator().next();
+            List<Integer> largestGroups = Lists.newArrayList();
+            for (int large : Multisets.copyHighestCountFirst(groupCounter).elementSet()) {
+                if (largestGroups.isEmpty()) {
+                    largestGroups.add(large);
+                } else if (groupCounter.count(largestGroups.get(0)) == groupCounter.count(large)) {
+                    largestGroups.add(large);
+                }
+            }
+            int largestGroup = largestGroups.get(random.nextInt(largestGroups.size()));
             // System.out.println("Cluster " + i + ": Group " + largestGroup);
             List<Integer> selectedWords = Lists.newArrayList();
-            for (int j = 0; j < clusters[i].length; j++) {
-                if (words[clusters[i][j]] == largestGroup) {
-                    selectedWords.add(clusters[i][j]);
-                    // System.out.print(clusters[i][j] + " ");
+            if (groupCounter.count(largestGroup) > 1) {
+                for (int j = 0; j < clusters[i].length; j++) {
+                    if (words[clusters[i][j]] == largestGroup) {
+                        selectedWords.add(clusters[i][j]);
+                        // System.out.print(clusters[i][j] + " ");
+                    }
                 }
             }
             // System.out.println();

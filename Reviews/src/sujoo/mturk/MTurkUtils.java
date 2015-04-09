@@ -27,9 +27,9 @@ public class MTurkUtils {
     private static Random random = new Random();
 
     public static void main(String[] args) throws Exception {
-        printApparelGroups();
+        //printApparelGroups();
         //printBookGroups();
-        //printCameraGroups();
+        printCameraGroups();
     }
     
     public static void printApparelGroups() throws Exception {
@@ -42,7 +42,7 @@ public class MTurkUtils {
     }
 
     public static void printCameraGroups() throws Exception {
-        readGroups("ReferenceFiles\\CameraWordList.csv", "ReferenceFiles\\TempCameraGroups.csv");
+        readGroups("ReferenceFiles\\CameraWordList.csv", "ReferenceFiles\\CameraGroups.csv");
 
         printGroups();
         // findOddPhrases();
@@ -51,7 +51,7 @@ public class MTurkUtils {
     }
 
     public static void printBookGroups() throws Exception {
-        readGroups("ReferenceFiles\\BookWordList.csv", "ReferenceFiles\\BookGroups.csv");
+        readGroups("ReferenceFiles\\BookWordList.csv", "ReferenceFiles\\BookGroupsDisplay1.csv");
 
         printGroups();
         // findOddPhrases();
