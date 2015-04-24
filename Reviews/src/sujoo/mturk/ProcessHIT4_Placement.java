@@ -157,6 +157,40 @@ public class ProcessHIT4_Placement {
         mTurkResultsReader.close();
     }
     
+    public void processFrom5() throws Exception {
+        // 0 HITId 1 HITTypeId 2 Title 3 Description 4 Keywords 5 Reward 6
+        // CreationTime 7 MaxAssignments 8 RequesterAnnotation
+        // 9 AssignmentDurationInSeconds 10 AutoApprovalDelayInSeconds 11
+        // Expiration 12 NumberOfSimilarHITs 13 LifetimeInSeconds 14
+        // AssignmentId
+        // 15 WorkerId 16 AssignmentStatus 17 AcceptTime 18 SubmitTime 19
+        // AutoApprovalTime 20 ApprovalTime 21 RejectionTime
+        // 22 RequesterFeedback 23 WorkTimeInSeconds 24 LifetimeApprovalRate 25
+        // Last30DaysApprovalRate 26 Last7DaysApprovalRate
+        // 27 Input.tables  28 Input.w1    29 Input.w2    30 Answer.keyphrases1  
+        // 31 Answer.word#
+        // 28 Input.w1  29 Input.w2    30 Input.w3    31 Input.w4    32 Input.w5
+        // 33 (38) Answer.keyphrases1  34 (39) Answer.word#
+
+        String currentLine = null;
+        currentLine = mTurkResultsReader.readLine();
+        while ((currentLine = mTurkResultsReader.readLine()) != null) {
+            String[] hitResult = currentLine.split("\t");
+            if (hitResult.length != 25) {
+                System.out.println("hi");
+            }
+            String[] results = hitResult[34].split("\\|");
+
+            getWordAssignment(hitResult[28], results[0]);
+            getWordAssignment(hitResult[29], results[1]);
+            getWordAssignment(hitResult[30], results[2]);
+            getWordAssignment(hitResult[31], results[3]);
+            getWordAssignment(hitResult[32], results[4]);
+        }
+
+        mTurkResultsReader.close();
+    }
+    
     public void getWordAssignment(String wordInput, String wordAssignment) {
         if (!wordInput.equals("")) {
             int wordId = Integer.parseInt(wordInput.split(" : ")[0].replace("#", ""));
