@@ -271,6 +271,14 @@ public class HierarchyUtility {
     public static String hierarchyToString(SynsetNode rootNode) {
         return rootNode.getKeyTermHierarchyWords().toString() + "\n" + getHierarchyToString(rootNode, "");
     }
+    
+    public static String hierarchyToTopicList(SynsetNode rootNode) {
+        String wordList = "";
+        for (String word : rootNode.getKeyTermHierarchyWords()) {
+            wordList += word + ",";
+        }
+        return wordList.substring(0, wordList.length() - 1);
+    }
 
     private static String getHierarchyToString(SynsetNode node, String frontBit) {
         DecimalFormat df = new DecimalFormat("#.00");

@@ -171,6 +171,7 @@ public class GenerateSynsetTopics {
         adjectiveHierarchyRootSynsets = adjWNouns;
         HierarchyUtility.mergeHierarchies(nounHypernymHierarchyRootSynsets, adjectiveHierarchyRootSynsets);
         disambiguate(nounHypernymHierarchyRootSynsets);
+        disambiguate(verbHierarchyRootSynsets);
     }
     
     public void disambiguate(List<SynsetNode> list) {
@@ -320,6 +321,22 @@ public class GenerateSynsetTopics {
         printHierarchy(verbHierarchyRootSynsets, "C:\\Users\\mbcusick\\Documents\\Results\\test\\VerbHierarchies.txt");
         printHierarchy(adjectiveHierarchyRootSynsets, "C:\\Users\\mbcusick\\Documents\\Results\\test\\AdjectiveHierarchies.txt");
         printHierarchy(adverbHierarchyRootSynsets, "C:\\Users\\mbcusick\\Documents\\Results\\test\\AdverbHierarchies.txt");
+        printTopicList(nounHypernymHierarchyRootSynsets, verbHierarchyRootSynsets, "C:\\Users\\mbcusick\\Documents\\Results\\test\\Topics.txt");
+    }
+    
+    private void printTopicList(List<SynsetNode> list1, List<SynsetNode> list2, String filePathName) throws IOException {
+        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filePathName)));
+        for (SynsetNode rootNode : list1) {
+            if (rootNode.getKeyTermHierarchyWords().size() >= 3) {
+                writer.println(HierarchyUtility.hierarchyToTopicList(rootNode));
+            }
+        }
+        for (SynsetNode rootNode : list2) {
+            if (rootNode.getKeyTermHierarchyWords().size() >= 3) {
+                writer.println(HierarchyUtility.hierarchyToTopicList(rootNode));
+            }
+        }
+        writer.close();
     }
     
     private void printHierarchy(List<SynsetNode> list, String filePathName) throws IOException {

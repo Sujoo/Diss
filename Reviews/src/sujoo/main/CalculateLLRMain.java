@@ -35,14 +35,18 @@ public class CalculateLLRMain {
         int counter = 0;
         int foregroundCount = 0;
         int backgroundCount = 0;
+        System.out.println("Select foreground corpus");
         FileReaderUtil foregroundReader = new FileReaderUtil();
+        System.out.println("Foreground: " + foregroundReader.getFileName());
+        System.out.println("Select background corpus");
         FileReaderUtil backgroundReader = new FileReaderUtil();
+        System.out.println("Background: " + backgroundReader.getFileName());
         try {
             while (foregroundReader.hasNext()) {
                 counter++;
                 String[] line = foregroundReader.next();
 
-                llr.addForegroundText(line[6]);
+                llr.addForegroundText(line[4]);
                 foregroundCount++;
 
                 if (counter % 10000 == 0) {
@@ -55,7 +59,7 @@ public class CalculateLLRMain {
                 counter++;
                 String[] line = backgroundReader.next();
 
-                llr.addBackgroundText(line[6]);
+                llr.addBackgroundText(line[0]);
                 backgroundCount++;
 
                 if (counter % 10000 == 0) {
