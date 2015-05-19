@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -28,16 +29,17 @@ public class MTurkUtils {
 
     public static void main(String[] args) throws Exception {
         printApparelGroups();
-        //printBookGroups();
-        //printCameraGroups();
+        printBookGroups();
+        printCameraGroups();
     }
     
     public static void printApparelGroups() throws Exception {
         readGroups("ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv");
 
-        printGroups();
+        printWordStats();
+        //printGroups();
         // findOddPhrases();
-        findMissingWords();
+        //findMissingWords();
         // findMissingReviews();
         //printWordList("15,35,47,54,59,65,66,73,81,83,84,90,96,105,111,117,155,158,159,168,169,175,179,194,207,212,216,220,223,224,225,229,235,240,245,248,251,253,254");
     }
@@ -45,43 +47,103 @@ public class MTurkUtils {
     public static void printCameraGroups() throws Exception {
         readGroups("ReferenceFiles\\CameraWordList.csv", "ReferenceFiles\\CameraGroups.csv");
 
-        printGroups();
+        printWordStats();
+        //printGroups();
         // findOddPhrases();
-        findMissingWords();
+        //findMissingWords();
         // findMissingReviews();
     }
 
     public static void printBookGroups() throws Exception {
         readGroups("ReferenceFiles\\BookWordList.csv", "ReferenceFiles\\BookGroups.csv");
 
-        printGroups();
+        printWordStats();
+        //printGroups();
         // findOddPhrases();
-        findMissingWords();
+        //findMissingWords();
         // findMissingReviews();
     }
     
-    public static void readApparel() throws Exception {
-        readGroups("ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv");
+    public static void printWordStats() { 
+        double over5 = 0;
+        double selOver5 = 0;
+        double count5 = 0;
+        double selCount5 = 0;
+        double count4 = 0;
+        double selCount4 = 0;
+        double count3 = 0;
+        double selCount3 = 0;
+        double count2 = 0;
+        double selCount2 = 0;
+        double count1 = 0;
+        double selCount1 = 0;
+        for (int wordId : wordReviewMap.keySet()) {
+            int numOfReviews = wordReviewMap.get(wordId).size();
+            if (numOfReviews > 5) {
+                over5++;
+                if (inGroup(wordId)) {
+                    selOver5++;
+                }
+            } else if (numOfReviews == 5) {
+                count5++;
+                if (inGroup(wordId)) {
+                    selCount5++;
+                }
+            } else if (numOfReviews == 4) {
+                count4++;
+                if (inGroup(wordId)) {
+                    selCount4++;
+                }
+            } else if (numOfReviews == 3) {
+                count3++;
+                if (inGroup(wordId)) {
+                    selCount3++;
+                }
+            } else if (numOfReviews == 2) {
+                count2++;
+                if (inGroup(wordId)) {
+                    selCount2++;
+                }
+            } else if (numOfReviews == 1) {
+                count1++;
+                if (inGroup(wordId)) {
+                    selCount1++;
+                }
+            } else {
+                System.out.println("wtf");
+            }
+        }
+        double totalWords = over5 + count5 + count4 + count3 + count2 + count1;
+        double totalSelectedWords = selOver5 + selCount5 + selCount4 + selCount3 + selCount2 + selCount1;
+        System.out.print("Total\t: ");
+        printPercent(totalSelectedWords, totalWords);
+        System.out.print("5 Over\t: ");
+        printPercent(selOver5, over5);
+        System.out.print("5 Count\t: ");
+        printPercent(selCount5, count5);
+        System.out.print("4 Count\t: ");
+        printPercent(selCount4, count4);
+        System.out.print("3 Count\t: ");
+        printPercent(selCount3, count3);
+        System.out.print("2 Count\t: ");
+        printPercent(selCount2, count2);
+        System.out.print("1 Count\t: ");
+        printPercent(selCount1, count1);
     }
     
-    public static void readCamera() throws Exception {
-        readGroups("ReferenceFiles\\CameraWordList.csv", "ReferenceFiles\\CameraGroups.csv");
+    public static void printPercent(double selected, double total) {
+        DecimalFormat df = new DecimalFormat("0.00");
+        System.out.println(df.format((selected / total)*100) + " (" + (int) selected + "/" + (int) total + ")");
     }
     
-    public static void readBooks() throws Exception {
-        readGroups("ReferenceFiles\\BookWordList.csv", "ReferenceFiles\\BookGroups.csv");
-    }
-    
-    public static Map<Integer, String> getWordListMap() {
-        return wordListMap;
-    }
-    
-    public static Multimap<Integer, Integer> getGroupWordMap() {
-        return groupWordMap;
-    }
-    
-    public static ListMultimap<Integer, String> getPhraseExamplesMap() {
-        return phraseExamplesMap;
+    public static boolean inGroup(int wordId) {
+        for (int groupId : groupWordMap.keySet()) {
+            if (groupWordMap.get(groupId).contains(wordId)) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     public static void cleanMTurkOutputFile(String inputFileName) throws Exception {
@@ -235,5 +297,28 @@ public class MTurkUtils {
 
         System.out.println("Reviews used by groups: " + reviewIds.size());
     }
-
+    
+    public static void readApparel() throws Exception {
+        readGroups("ReferenceFiles\\ApparelWordList.csv", "ReferenceFiles\\ApparelGroups.csv");
+    }
+    
+    public static void readCamera() throws Exception {
+        readGroups("ReferenceFiles\\CameraWordList.csv", "ReferenceFiles\\CameraGroups.csv");
+    }
+    
+    public static void readBooks() throws Exception {
+        readGroups("ReferenceFiles\\BookWordList.csv", "ReferenceFiles\\BookGroups.csv");
+    }
+    
+    public static Map<Integer, String> getWordListMap() {
+        return wordListMap;
+    }
+    
+    public static Multimap<Integer, Integer> getGroupWordMap() {
+        return groupWordMap;
+    }
+    
+    public static ListMultimap<Integer, String> getPhraseExamplesMap() {
+        return phraseExamplesMap;
+    }
 }

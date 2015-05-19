@@ -12,28 +12,40 @@ import com.google.common.collect.Lists;
 public class ProcessHIT6_TopicEvaluation {
     private BufferedReader mTurkResultsReader;
     private ListMultimap<Integer, Double> groupRatings;
+    
+    public static void cleanMTurkFile(String folder, String file) throws Exception {
+        MTurkUtils.cleanMTurkOutputFile(folder + file);
+    }
 
     public static void main(String[] args) throws Exception {
-        System.out.println("LDA Apparel");
-        runEval("HIT6Downloads\\" + "LDAApparel.csv");
-        System.out.println("LDA Book");
-        runEval("HIT6Downloads\\" + "LDABook.csv");
         System.out.println("LDA Camera");
-        runEval("HIT6Downloads\\" + "LDACamera.csv");
-        
-        System.out.println("LLR Apparel");
-        runEval("HIT6Downloads\\" + "LLRApparel.csv");
-        System.out.println("LLR Book");
-        runEval("HIT6Downloads\\" + "LLRBook.csv");
+        runEval("HIT6Downloads\\" + "LDACameraRedux.csv");
         System.out.println("LLR Camera");
-        runEval("HIT6Downloads\\" + "LLRCamera.csv");
+        runEval("HIT6Downloads\\" + "LLRCameraRedux.csv");
+        System.out.println("TEST Camera");
+        runEval("HIT6Downloads\\" + "TESTCamera.csv");
         
-        System.out.println("NCRP Apparel");
-        runEval("HIT6Downloads\\" + "NCRPApparel.csv");
-        System.out.println("NCRP Book");
-        runEval("HIT6Downloads\\" + "NCRPBook.csv");
-        System.out.println("NCRP Camera");
-        runEval("HIT6Downloads\\" + "NCRPCamera.csv");
+        // cleanMTurkFile("HIT6Downloads\\", "TESTCamera");
+//        System.out.println("LDA Apparel");
+//        runEval("HIT6Downloads\\" + "LDAApparel.csv");
+//        System.out.println("LDA Book");
+//        runEval("HIT6Downloads\\" + "LDABook.csv");
+//        System.out.println("LDA Camera");
+//        runEval("HIT6Downloads\\" + "LDACamera.csv");
+//        
+//        System.out.println("LLR Apparel");
+//        runEval("HIT6Downloads\\" + "LLRApparel.csv");
+//        System.out.println("LLR Book");
+//        runEval("HIT6Downloads\\" + "LLRBook.csv");
+//        System.out.println("LLR Camera");
+//        runEval("HIT6Downloads\\" + "LLRCamera.csv");
+//        
+//        System.out.println("NCRP Apparel");
+//        runEval("HIT6Downloads\\" + "NCRPApparel.csv");
+//        System.out.println("NCRP Book");
+//        runEval("HIT6Downloads\\" + "NCRPBook.csv");
+//        System.out.println("NCRP Camera");
+//        runEval("HIT6Downloads\\" + "NCRPCamera.csv");
     }
     
     public static void runEval(String inputFile) throws Exception {

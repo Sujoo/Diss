@@ -22,7 +22,7 @@ public class PrepareHIT6_TopicEvaluation {
     
     public static void main(String[] args) throws Exception {
         String type = "camera";
-        String alg = "LDA";
+        String alg= "TEST";
         PrepareHIT6_TopicEvaluation p = new PrepareHIT6_TopicEvaluation(alg + "Output\\" + type + "_topics.csv", "HIT6Uploads\\" + alg + "_" + type + ".csv", type);
         p.createOutput();
     }

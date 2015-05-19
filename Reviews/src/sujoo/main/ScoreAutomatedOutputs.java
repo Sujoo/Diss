@@ -35,9 +35,10 @@ public class ScoreAutomatedOutputs {
     private final DecimalFormat df = new DecimalFormat("0.000");
 
     public static void main(String[] args) throws Exception {
-        runApparel();
-        runBook();
-        runCamera();
+        //runApparel();
+        //runBook();
+        //runCamera();
+        runTest();
     }
 
     public static void runApparel() throws Exception {
@@ -54,6 +55,26 @@ public class ScoreAutomatedOutputs {
         System.out.println("NCRP Apparel:");
         runIt(new ScoreAutomatedOutputs(wordList, groups, "NCRPOutput\\apparel_topics.csv"));
         System.out.println();
+    }
+
+    public static void runTest() throws Exception {
+        String wordList = "ReferenceFiles\\CameraWordList.csv";
+        String groups = "ReferenceFiles\\CameraGroups.csv";
+        System.out.println("Test Camera:");
+        runIt(new ScoreAutomatedOutputs(wordList, groups, "TESTOutput\\camera_topics.csv"));
+        System.out.println();
+        System.out.println("LDA Camera:");
+        runIt(new ScoreAutomatedOutputs(wordList, groups, "LDAOutput\\camera_topics.csv"));
+        System.out.println();
+        System.out.println("LLR Camera:");
+        runIt(new ScoreAutomatedOutputs(wordList, groups, "LLROutput\\camera_topics.csv"));
+        System.out.println();
+        
+//        wordList = "ReferenceFiles\\CameraWordList.csv";
+//        groups = "ReferenceFiles\\CameraGroups.csv";
+//        System.out.println("Test Camera:");
+//        runIt(new ScoreAutomatedOutputs(wordList, groups, "TESTOutput\\camera_topics.csv"));
+//        System.out.println();
     }
 
     public static void runBook() throws Exception {
@@ -137,6 +158,10 @@ public class ScoreAutomatedOutputs {
             }
         }
         groupReader.close();
+        
+//        for (int id : groupWordMap.keySet()) {
+//            System.out.println(groupWordMap.get(id));
+//        }
 
         currentLine = null;
         int groupCounter = 1;
@@ -218,7 +243,7 @@ public class ScoreAutomatedOutputs {
                         if (list.size() > 1) {
                             scoreDiff = list.get(0).getMeasures().getFscore() - list.get(1).getMeasures().getFscore();
                         } else {
-                            scoreDiff = 0;
+                            scoreDiff = list.get(0).getMeasures().getFscore();
                         }
                         if (scoreDiff > highestScoreDiff) {
                             highestScoreDiff = scoreDiff;
@@ -234,6 +259,10 @@ public class ScoreAutomatedOutputs {
                                 List<GroupIdMeasure> list = autoGroupList.get(id);
                                 if (list.size() > 1) {
                                     list.remove(0);
+                                } else if (list.size() == 1) {
+                                    int groupId = list.get(0).getGroupId();
+                                    list.remove(0);
+                                    list.add(new GroupIdMeasure(groupId, new Measures(0.0, 0.0, 0.0)));
                                 }
                             }
                         }
@@ -253,8 +282,10 @@ public class ScoreAutomatedOutputs {
                     if (autoId1 != autoId2) {
                         List<GroupIdMeasure> list2 = autoGroupList.get(autoId2);
                         if (list1.get(0).getGroupId() == list2.get(0).getGroupId()) {
-                            if (list1.size() == 1 || list2.size() == 1) {
-
+                            if (list1.size() == 1 && list1.get(0).getMeasures().getFscore() == 0.0) {
+                                result = false;
+                            } else if (list2.size() == 1 && list2.get(0).getMeasures().getFscore() == 0.0) {
+                                result = false;
                             } else {
                                 return true;
                             }
